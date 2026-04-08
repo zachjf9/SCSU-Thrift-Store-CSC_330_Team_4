@@ -12,4 +12,4 @@
   
 **Push** :
 
-   git push origin feature/YOURNAME
+    git push origin feature/YOURNAME
