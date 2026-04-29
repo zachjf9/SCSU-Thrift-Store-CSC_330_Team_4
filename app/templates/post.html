@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ post.title }}</h1>
+<p>{{ post.description }}</p>
+<p>{{ post.category }}</p>
+<p>{{ post.owner.username }}</p>
+
+{% if post.owner_id == current_user.id or current_user.is_admin %}
+<p><a href="{{ url_for('main.edit_post', post_id=post.id) }}">Edit</a></p>
+<form method="post" action="{{ url_for('main.delete_post', post_id=post.id) }}">
+    <input type="submit" value="Delete">
+</form>
+{% endif %}
+
+{% if post.owner_id != current_user.id %}
+<h2>Message</h2>
+<form method="post">
+    {{ form.hidden_tag() }}
+    <p>{{ form.message.label }} {{ form.message(rows=4) }}</p>
+    {% for error in form.message.errors %}<p>{{ error }}</p>{% endfor %}
+    <p>{{ form.submit() }}</p>
+</form>
+<p><a href="{{ url_for('main.review', user_id=post.owner_id) }}">Review User</a></p>
+{% endif %}
+
+<h2>Reviews</h2>
+{% for review in reviews %}
+<p>{{ review.rating }}/5 by {{ review.reviewer.username }}: {{ review.comment }}</p>
+{% else %}
+<p>No reviews.</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,24 @@
+<!doctype html>
+<title>{{ title or 'Campus Closet' }}</title>
+
+<a href="{{ url_for('main.home') }}">Listings</a>
+{% if current_user.is_authenticated %}
+<a href="{{ url_for('main.create_post') }}">Create Listing</a>
+<a href="{{ url_for('main.messages') }}">Messages</a>
+<a href="{{ url_for('main.profile') }}">Profile</a>
+{% if current_user.is_admin %}
+<a href="{{ url_for('main.admin_users') }}">Manage Users</a>
+{% endif %}
+<a href="{{ url_for('main.logout') }}">Logout</a>
+{% else %}
+<a href="{{ url_for('main.login') }}">Login</a>
+<a href="{{ url_for('main.register') }}">Register</a>
+{% endif %}
+
+{% with messages = get_flashed_messages() %}
+{% for message in messages %}
+<p>{{ message }}</p>
+{% endfor %}
+{% endwith %}
+
+{% block content %}{% endblock %}

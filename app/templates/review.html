@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ title or 'Review' }} {{ user.username }}</h1>
+<form method="post">
+    {{ form.hidden_tag() }}
+    <p>{{ form.rating.label }} {{ form.rating() }}</p>
+    {% for error in form.rating.errors %}<p>{{ error }}</p>{% endfor %}
+    <p>{{ form.comment.label }} {{ form.comment(rows=4) }}</p>
+    {% for error in form.comment.errors %}<p>{{ error }}</p>{% endfor %}
+    <p>{{ form.submit() }}</p>
+</form>
+{% endblock %}

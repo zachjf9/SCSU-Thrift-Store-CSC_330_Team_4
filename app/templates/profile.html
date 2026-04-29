@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Profile</h1>
+<form method="post">
+    {{ form.hidden_tag() }}
+    <p>{{ form.name.label }} {{ form.name() }}</p>
+    <p>{{ form.major.label }} {{ form.major() }}</p>
+    <p>{{ form.interests.label }} {{ form.interests(rows=4) }}</p>
+    <p>{{ form.submit() }}</p>
+</form>
+
+<h2>Reviews About You</h2>
+{% for review in received_reviews %}
+<p>{{ review.rating }}/5 by {{ review.reviewer.username }}: {{ review.comment }}</p>
+{% else %}
+<p>No reviews.</p>
+{% endfor %}
+
+<h2>Your Reviews</h2>
+{% for review in authored_reviews %}
+<p>{{ review.rating }}/5 for {{ review.reviewed.username }}: {{ review.comment }}</p>
+<p><a href="{{ url_for('main.edit_review', review_id=review.id) }}">Edit</a></p>
+<form method="post" action="{{ url_for('main.delete_review', review_id=review.id) }}">
+    <input type="submit" value="Delete">
+</form>
+{% else %}
+<p>No reviews.</p>
+{% endfor %}
+{% endblock %}

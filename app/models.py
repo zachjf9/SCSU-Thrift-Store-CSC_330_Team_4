@@ -6,6 +6,7 @@ from datetime import datetime
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     is_admin = db.Column(db.Boolean, default=False)
+    is_blocked = db.Column(db.Boolean, default=False)
 
     email = db.Column(db.String(150), unique=True, nullable=False)
     username = db.Column(db.String(150), unique=True, nullable=False)
@@ -31,7 +32,9 @@ class Post(db.Model):
 
     title = db.Column(db.String(150), nullable=False)
     description = db.Column(db.String(300), nullable=False)
+    category = db.Column(db.String(80), default='General')
     image = db.Column(db.String(200))  # optional image path
+    is_active = db.Column(db.Boolean, default=True)
 
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
