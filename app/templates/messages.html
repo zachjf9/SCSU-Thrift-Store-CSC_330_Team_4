@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Messages</h1>
+{% for message in messages %}
+<p>From {{ message.sender.username }}: {{ message.content }}</p>
+{% else %}
+<p>No messages.</p>
+{% endfor %}
+{% endblock %}

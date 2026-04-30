@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Register</h1>
+<h1>Edit User</h1>
 <form method="post">
     {{ form.hidden_tag() }}
     <p>{{ form.email.label }} {{ form.email() }}</p>
     {% for error in form.email.errors %}<p>{{ error }}</p>{% endfor %}
     <p>{{ form.username.label }} {{ form.username() }}</p>
     {% for error in form.username.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.password.label }} {{ form.password() }}</p>
-    {% for error in form.password.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.confirm_password.label }} {{ form.confirm_password() }}</p>
-    {% for error in form.confirm_password.errors %}<p>{{ error }}</p>{% endfor %}
+    <p>{{ form.name.label }} {{ form.name() }}</p>
+    <p>{{ form.major.label }} {{ form.major() }}</p>
+    <p>{{ form.is_admin() }} {{ form.is_admin.label }}</p>
+    <p>{{ form.is_blocked() }} {{ form.is_blocked.label }}</p>
     <p>{{ form.submit() }}</p>
 </form>
 {% endblock %}

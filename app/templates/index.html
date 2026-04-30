@@ -1,18 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Campus Closet</title>
-</head>
-<body>
-    <h1>Campus Closet Posts</h1>
+{% extends 'base.html' %}
+{% block content %}
+<h1>Listings</h1>
 
-    {% for post in posts %}
-        <div>
-            <h3>{{ post.title }}</h3>
-            <p>{{ post.description }}</p>
-        </div>
-    {% endfor %}
+<form method="get">
+    Search: <input name="q" value="{{ search }}">
+    Category:
+    <select name="category">
+        <option value="">All</option>
+        {% for category in categories %}
+        <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>{{ category }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Search">
+</form>
 
-    <a href="{{ url_for('main.create_post') }}">Create Post</a>
-</body>
-</html>
+{% for post in posts %}
+<h3><a href="{{ url_for('main.view_post', post_id=post.id) }}">{{ post.title }}</a></h3>
+<p>{{ post.description }}</p>
+<p>{{ post.category }} - {{ post.owner.username }}</p>
+{% else %}
+<p>No listings.</p>
+{% endfor %}
+{% endblock %}
