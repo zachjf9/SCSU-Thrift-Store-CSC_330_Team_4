@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -14,6 +16,7 @@ def create_app():
 
     db.init_app(app)
     login_manager.init_app(app)
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
     from . import routes
     app.register_blueprint(routes.main)  # FIXED

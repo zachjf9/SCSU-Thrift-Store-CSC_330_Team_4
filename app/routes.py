@@ -1,14 +1,36 @@
 from functools import wraps
+import os 
+from uuid import uuid4
 
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
 from . import db
 from .forms import LoginForm, MessageForm, PostForm, ProfileForm, RegisterForm, ReviewForm, UserAdminForm
 from .models import Message, Notification, Post, Review, User
 
 main = Blueprint('main', __name__)
+
+def allowed_image(filename):
+    allowed_extensions = current_app.config.get('ALLOWED_IMAGE_EXTENSIONS', set())
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+
+def save_listing_image(image_file):
+    if not image_file or not image_file.filename:
+        return None, None
+
+    if not allowed_image(image_file.filename):
+        return None, 'Please upload a PNG, JPG, JPEG, GIF, or WEBP image.'
+
+    original_name = secure_filename(image_file.filename)
+    extension = original_name.rsplit('.', 1)[1].lower()
+    filename = f'{uuid4().hex}.{extension}'
+    image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+    image_file.save(image_path)
+    return filename, None
 
 
 def admin_required(view):
@@ -111,10 +133,16 @@ def create_post():
     form = PostForm()
 
     if form.validate_on_submit():
+        image_filename, image_error = save_listing_image(form.image.data)
+        if image_error:
+            flash(image_error)
+            return render_template('post_form.html', form=form, title='Create Listing')
+
         post = Post(
             title=form.title.data,
             description=form.description.data,
             category=form.category.data,
+            image=image_filename,
             owner_id=current_user.id,
         )
         db.session.add(post)
@@ -152,9 +180,16 @@ def edit_post(post_id):
 
     form = PostForm(obj=post)
     if form.validate_on_submit():
+        image_filename, image_error = save_listing_image(form.image.data)
+        if image_error:
+            flash(image_error)
+            return render_template('post_form.html', form=form, title='Edit Listing')
+
         post.title = form.title.data
         post.description = form.description.data
         post.category = form.category.data
+        if image_filename:
+            post.image = image_filename
         db.session.commit()
         flash('Listing updated!')
         return redirect(url_for('main.view_post', post_id=post.id))
