@@ -1,18 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Campus Closet</title>
-</head>
-<body>
-    <h1>Campus Closet Posts</h1>
+{% extends "base.html" %}
 
-    {% for post in posts %}
-        <div>
-            <h3>{{ post.title }}</h3>
-            <p>{{ post.description }}</p>
+{% block title %}The Thrifty Owls{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>The Thrifty Owls</h1>
+    <p class="muted">A simple student marketplace for clothes, dorm extras, and campus swaps.</p>
+    {% if current_user.is_authenticated %}
+        <p><a class="button" href="{{ url_for('main.create_post') }}">Post an Item</a></p>
+    {% else %}
+        <p><a class="button" href="{{ url_for('main.register') }}">Join With Your SCSU Email</a></p>
+    {% endif %}
+</section>
+
+<section>
+    <h2>Recent Posts</h2>
+    {% if posts %}
+        <div class="grid">
+            {% for post in posts %}
+                <article class="card">
+                    <h3>{{ post.title }}</h3>
+                    <p>{{ post.description }}</p>
+                    <div class="meta">
+                        <span>Posted by {{ post.owner.username }}</span>
+                        <span>{{ post.timestamp.strftime('%b %d, %Y') }}</span>
+                    </div>
+                    {% if current_user.is_authenticated %}
+                        <p><a href="{{ url_for('main.view_post', post_id=post.id) }}">View details</a></p>
+                    {% endif %}
+                </article>
+            {% endfor %}
         </div>
-    {% endfor %}
-
-    <a href="{{ url_for('main.create_post') }}">Create Post</a>
-</body>
-</html>
+    {% else %}
+        <div class="empty">No posts yet. Be the first student to add one.</div>
+    {% endif %}
+</section>
+{% endblock %}

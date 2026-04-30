@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}The Thrifty Owls{% endblock %}</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <div class="shell">
+        <header class="topbar">
+            <a class="brand" href="{{ url_for('main.home') }}">The Thrifty Owls</a>
+            <nav class="nav">
+                <a class="secondary" href="{{ url_for('main.home') }}">Home</a>
+                {% if current_user.is_authenticated %}
+                    <a class="secondary" href="{{ url_for('main.create_post') }}">Create Post</a>
+                    <a class="secondary" href="{{ url_for('main.messages') }}">Messages</a>
+                    <a class="secondary" href="{{ url_for('main.profile') }}">Profile</a>
+                    <a href="{{ url_for('main.logout') }}">Logout</a>
+                {% else %}
+                    <a class="secondary" href="{{ url_for('main.login') }}">Login</a>
+                    <a href="{{ url_for('main.register') }}">Register</a>
+                {% endif %}
+            </nav>
+        </header>
+
+        <main class="container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-list">
+                        {% for message in messages %}
+                            <div class="flash">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

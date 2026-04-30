@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Messages | The Thrifty Owls{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Your Messages</h1>
+    <p class="muted">Messages from other students about your listings show up here.</p>
+</section>
+
+<section>
+    {% if messages %}
+        {% for message in messages %}
+            <article class="card">
+                <h3>From {{ message.sender.username }}</h3>
+                <p>{{ message.content }}</p>
+                <div class="meta">
+                    <span>{{ message.timestamp.strftime('%b %d, %Y at %I:%M %p') }}</span>
+                    <span><a href="{{ url_for('main.review', user_id=message.sender.id) }}">Leave a review</a></span>
+                </div>
+            </article>
+        {% endfor %}
+    {% else %}
+        <div class="empty">Your inbox is empty right now.</div>
+    {% endif %}
+</section>
+{% endblock %}

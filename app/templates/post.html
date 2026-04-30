@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} | The Thrifty Owls{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>{{ post.title }}</h1>
+    <p class="muted">Connect with the seller and ask about pickup, condition, or price.</p>
+</section>
+
+<div class="grid two-col">
+    <section class="card">
+        <h2>Listing Details</h2>
+        <p>{{ post.description }}</p>
+        <div class="meta">
+            <span>Owner: {{ post.owner.username }}</span>
+            <span>Posted {{ post.timestamp.strftime('%b %d, %Y') }}</span>
+        </div>
+        <p><a href="{{ url_for('main.review', user_id=post.owner.id) }}">Review this user</a></p>
+    </section>
+
+    <section class="card">
+        <h2>Send a Message</h2>
+        {% if current_user.id == post.owner_id %}
+            <p class="muted">This is your post, so the message form is hidden.</p>
+        {% else %}
+            <form method="POST">
+                {{ form.hidden_tag() }}
+
+                <div>
+                    <label for="{{ form.message.id }}">{{ form.message.label.text }}</label>
+                    {{ form.message() }}
+                    {% if form.message.errors %}
+                        <ul class="field-errors">
+                            {% for error in form.message.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                {{ form.submit() }}
+            </form>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
