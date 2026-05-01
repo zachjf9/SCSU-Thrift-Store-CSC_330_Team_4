@@ -1,4 +1,5 @@
 from functools import wraps
+from datetime import datetime, timedelta
 import os 
 from uuid import uuid4
 
@@ -9,7 +10,7 @@ from werkzeug.utils import secure_filename
 
 from . import db
 from .forms import LoginForm, MessageForm, PostForm, ProfileForm, RegisterForm, ReviewForm, UserAdminForm
-from .models import Message, Notification, Post, Review, User
+from .models import Favorite, Message, Notification, Post, Review, User
 
 main = Blueprint('main', __name__)
 
@@ -50,16 +51,33 @@ def home():
     query = Post.query.filter_by(is_active=True)
     search = request.args.get('q', '').strip()
     category = request.args.get('category', '').strip()
+    date_filter = request.args.get('date_filter', '').strip()
 
     if search:
         pattern = f'%{search}%'
         query = query.filter((Post.title.ilike(pattern)) | (Post.description.ilike(pattern)))
     if category:
         query = query.filter_by(category=category)
+    if date_filter == '7':
+        query = query.filter(Post.timestamp >= datetime.utcnow() - timedelta(days=7))
+    elif date_filter == '30':
+        query = query.filter(Post.timestamp >= datetime.utcnow() - timedelta(days=30))
 
     posts = query.order_by(Post.timestamp.desc()).all()
     categories = [row[0] for row in db.session.query(Post.category).distinct().order_by(Post.category).all() if row[0]]
-    return render_template('index.html', posts=posts, categories=categories, search=search, selected_category=category)
+    favorite_post_ids = set()
+    if current_user.is_authenticated:
+        favorite_post_ids = {favorite.post_id for favorite in Favorite.query.filter_by(user_id=current_user.id).all()}
+
+    return render_template(
+        'index.html',
+        posts=posts,
+        categories=categories,
+        search=search,
+        selected_category=category,
+        selected_date_filter=date_filter,
+        favorite_post_ids=favorite_post_ids,
+    )
 
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -170,7 +188,48 @@ def view_post(post_id):
         return redirect(url_for('main.view_post', post_id=post.id))
 
     reviews = Review.query.filter_by(reviewed_id=post.owner_id).order_by(Review.timestamp.desc()).all()
-    return render_template('post.html', post=post, form=form, reviews=reviews)
+    is_favorite = Favorite.query.filter_by(user_id=current_user.id, post_id=post.id).first() is not None
+    return render_template('post.html', post=post, form=form, reviews=reviews, is_favorite=is_favorite)
+
+
+@main.route('/favorites')
+@login_required
+def favorites():
+    saved_posts = (
+        Post.query
+        .join(Favorite, Favorite.post_id == Post.id)
+        .filter(Favorite.user_id == current_user.id, Post.is_active == True)
+        .order_by(Favorite.timestamp.desc())
+        .all()
+    )
+    return render_template('favorites.html', posts=saved_posts)
+
+
+@main.route('/post/<int:post_id>/favorite', methods=['POST'])
+@login_required
+def favorite_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.owner_id == current_user.id:
+        flash('You cannot favorite your own listing.')
+        return redirect(url_for('main.view_post', post_id=post.id))
+
+    existing_favorite = Favorite.query.filter_by(user_id=current_user.id, post_id=post.id).first()
+    if not existing_favorite:
+        db.session.add(Favorite(user_id=current_user.id, post_id=post.id))
+        db.session.commit()
+        flash('Listing added to favorites.')
+
+    return redirect(request.referrer or url_for('main.view_post', post_id=post.id))
+
+
+@main.route('/post/<int:post_id>/unfavorite', methods=['POST'])
+@login_required
+def unfavorite_post(post_id):
+    favorite = Favorite.query.filter_by(user_id=current_user.id, post_id=post_id).first_or_404()
+    db.session.delete(favorite)
+    db.session.commit()
+    flash('Listing removed from favorites.')
+    return redirect(request.referrer or url_for('main.favorites'))
 
 
 @main.route('/post/<int:post_id>/edit', methods=['GET', 'POST'])

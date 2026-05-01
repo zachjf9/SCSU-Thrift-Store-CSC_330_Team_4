@@ -44,6 +44,17 @@ class Post(db.Model):
     # Foreign key
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+
+class Favorite(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('favorites', lazy=True))
+    post = db.relationship('Post', backref=db.backref('favorites', lazy=True))
+    __table_args__ = (db.UniqueConstraint('user_id', 'post_id', name='unique_user_favorite'),)
+
 # Messages
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)

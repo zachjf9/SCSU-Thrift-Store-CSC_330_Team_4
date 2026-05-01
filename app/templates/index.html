@@ -29,6 +29,14 @@
                 {% endfor %}
             </select>
         </div>
+        <div>
+            <label for="date_filter">Date</label>
+            <select id="date_filter" name="date_filter">
+                <option value="" {% if not selected_date_filter %}selected{% endif %}>Any time</option>
+                <option value="7" {% if selected_date_filter == '7' %}selected{% endif %}>Last 7 days</option>
+                <option value="30" {% if selected_date_filter == '30' %}selected{% endif %}>Last 30 days</option>
+            </select>
+        </div>
         <input type="submit" value="Search">
     </form>
 </section>
@@ -49,6 +57,17 @@
                         <span>{{ post.status or 'Available' }}</span>
                         <span>Posted by {{ post.owner.username }}</span>
                     </div>
+                    {% if current_user.is_authenticated and post.owner_id != current_user.id %}
+                        {% if post.id in favorite_post_ids %}
+                            <form method="post" action="{{ url_for('main.unfavorite_post', post_id=post.id) }}">
+                                <input type="submit" value="Remove Favorite">
+                            </form>
+                        {% else %}
+                            <form method="post" action="{{ url_for('main.favorite_post', post_id=post.id) }}">
+                                <input type="submit" value="Favorite">
+                            </form>
+                        {% endif %}
+                    {% endif %}
                 </article>
             {% endfor %}
         </div>

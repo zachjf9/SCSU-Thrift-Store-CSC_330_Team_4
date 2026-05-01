@@ -30,6 +30,14 @@
             <form method="post" action="{{ url_for('main.delete_post', post_id=post.id) }}">
                 <input type="submit" value="Delete Listing">
             </form>
+        {% elif is_favorite %}
+            <form method="post" action="{{ url_for('main.unfavorite_post', post_id=post.id) }}">
+                <input type="submit" value="Remove Favorite">
+            </form>
+        {% else %}
+            <form method="post" action="{{ url_for('main.favorite_post', post_id=post.id) }}">
+                <input type="submit" value="Favorite">
+            </form>
         {% endif %}
     </section>
 
