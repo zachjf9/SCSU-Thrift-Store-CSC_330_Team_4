@@ -45,6 +45,9 @@ def ensure_schema():
         post_columns = {column['name'] for column in inspector.get_columns('post')}
         additions = {
             'category': "VARCHAR(80) DEFAULT 'General'",
+            'price': 'NUMERIC(10, 2)',
+            'condition': "VARCHAR(80) DEFAULT 'Good'",
+            'status': "VARCHAR(80) DEFAULT 'Available'",
             'is_active': 'BOOLEAN DEFAULT 1',
         }
         for name, definition in additions.items():

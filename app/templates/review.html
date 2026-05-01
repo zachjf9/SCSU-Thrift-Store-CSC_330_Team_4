@@ -1,12 +1,27 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}{{ title or 'Review' }} {{ user.username }} | The Thrifty Owls{% endblock %}
+
 {% block content %}
-<h1>{{ title or 'Review' }} {{ user.username }}</h1>
-<form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.rating.label }} {{ form.rating() }}</p>
-    {% for error in form.rating.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.comment.label }} {{ form.comment(rows=4) }}</p>
-    {% for error in form.comment.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.submit() }}</p>
-</form>
+<section class="hero">
+    <h1>{{ title or 'Review' }} {{ user.username }}</h1>
+    <p class="muted">Share a quick rating and comment after a campus exchange.</p>
+</section>
+
+<section class="card">
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div>
+            <label for="{{ form.rating.id }}">{{ form.rating.label.text }}</label>
+            {{ form.rating() }}
+            {% for error in form.rating.errors %}<p class="field-errors">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+            <label for="{{ form.comment.id }}">{{ form.comment.label.text }}</label>
+            {{ form.comment(rows=4) }}
+            {% for error in form.comment.errors %}<p class="field-errors">{{ error }}</p>{% endfor %}
+        </div>
+        <p>{{ form.submit() }}</p>
+    </form>
+</section>
 {% endblock %}

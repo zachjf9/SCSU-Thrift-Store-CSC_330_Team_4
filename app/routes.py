@@ -142,6 +142,9 @@ def create_post():
             title=form.title.data,
             description=form.description.data,
             category=form.category.data,
+            price=form.price.data,
+            condition=form.condition.data,
+            status=form.status.data,
             image=image_filename,
             owner_id=current_user.id,
         )
@@ -188,6 +191,9 @@ def edit_post(post_id):
         post.title = form.title.data
         post.description = form.description.data
         post.category = form.category.data
+        post.price = form.price.data
+        post.condition = form.condition.data
+        post.status = form.status.data
         if image_filename:
             post.image = image_filename
         db.session.commit()

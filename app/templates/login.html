@@ -1,12 +1,28 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}Login | The Thrifty Owls{% endblock %}
+
 {% block content %}
-<h1>Login</h1>
-<form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.email.label }} {{ form.email() }}</p>
-    {% for error in form.email.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.password.label }} {{ form.password() }}</p>
-    {% for error in form.password.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.submit() }}</p>
-</form>
+<section class="hero">
+    <h1>Welcome Back</h1>
+    <p class="muted">Log in to message other students, create listings, and manage your profile.</p>
+</section>
+
+<section class="card">
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div>
+            <label for="{{ form.email.id }}">{{ form.email.label.text }}</label>
+            {{ form.email() }}
+            {% for error in form.email.errors %}<p class="field-errors">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+            <label for="{{ form.password.id }}">{{ form.password.label.text }}</label>
+            {{ form.password() }}
+            {% for error in form.password.errors %}<p class="field-errors">{{ error }}</p>{% endfor %}
+        </div>
+        <p>{{ form.submit() }}</p>
+    </form>
+    <p class="muted">Need an account? <a href="{{ url_for('main.register') }}">Register here</a>.</p>
+</section>
 {% endblock %}

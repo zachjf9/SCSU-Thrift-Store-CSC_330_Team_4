@@ -1,24 +1,59 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}The Thrifty Owls{% endblock %}
+
 {% block content %}
-<h1>Listings</h1>
+<section class="hero">
+    <h1>The Thrifty Owls</h1>
+    <p class="muted">A student marketplace for clothes, dorm extras, books, and campus swaps.</p>
+    {% if current_user.is_authenticated %}
+        <p><a class="button" href="{{ url_for('main.create_post') }}">Post an Item</a></p>
+    {% else %}
+        <p><a class="button" href="{{ url_for('main.register') }}">Join With Your SCSU Email</a></p>
+    {% endif %}
+</section>
 
-<form method="get">
-    Search: <input name="q" value="{{ search }}">
-    Category:
-    <select name="category">
-        <option value="">All</option>
-        {% for category in categories %}
-        <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>{{ category }}</option>
-        {% endfor %}
-    </select>
-    <input type="submit" value="Search">
-</form>
+<section class="card">
+    <h2>Browse Listings</h2>
+    <form method="get">
+        <div>
+            <label for="q">Search</label>
+            <input id="q" name="q" value="{{ search }}">
+        </div>
+        <div>
+            <label for="category">Category</label>
+            <select id="category" name="category">
+                <option value="">All</option>
+                {% for category in categories %}
+                    <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>{{ category }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <input type="submit" value="Search">
+    </form>
+</section>
 
-{% for post in posts %}
-<h3><a href="{{ url_for('main.view_post', post_id=post.id) }}">{{ post.title }}</a></h3>
-<p>{{ post.description }}</p>
-<p>{{ post.category }} - {{ post.owner.username }}</p>
-{% else %}
-<p>No listings.</p>
-{% endfor %}
+<section>
+    <h2>Recent Listings</h2>
+    {% if posts %}
+        <div class="grid">
+            {% for post in posts %}
+                <article class="card">
+                    <h3><a href="{{ url_for('main.view_post', post_id=post.id) }}">{{ post.title }}</a></h3>
+                    <p>{{ post.description }}</p>
+                    <div class="meta">
+                        <span>{{ post.category }}</span>
+                        {% if post.price is not none %}
+                            <span>${{ "%.2f"|format(post.price) }}</span>
+                        {% endif %}
+                        <span>{{ post.status or 'Available' }}</span>
+                        <span>Posted by {{ post.owner.username }}</span>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">No listings yet. Be the first student to add one.</div>
+    {% endif %}
+</section>
 {% endblock %}

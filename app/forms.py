@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, IntegerField, PasswordField, SelectField, StringField, SubmitField, TextAreaField, FileField
+from wtforms import DecimalField
 from wtforms.validators import DataRequired, EqualTo, Length, NumberRange, Optional, ValidationError
 from .models import User
 
@@ -77,6 +78,19 @@ class PostForm(FlaskForm):
         ('Furniture', 'Furniture'),
         ('School Supplies', 'School Supplies'),
         ('Other', 'Other')
+    ])
+    price = DecimalField('Price', places=2, validators=[Optional(), NumberRange(min=0)])
+    condition = SelectField('Condition', choices=[
+        ('New', 'New'),
+        ('Like New', 'Like New'),
+        ('Good', 'Good'),
+        ('Fair', 'Fair'),
+        ('Poor', 'Poor')
+    ])
+    status = SelectField('Status', choices=[
+        ('Available', 'Available'),
+        ('Pending', 'Pending'),
+        ('Sold', 'Sold')
     ])
     image = FileField('Image')  # optional
     submit = SubmitField('Save')

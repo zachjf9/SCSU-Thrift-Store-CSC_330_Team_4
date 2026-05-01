@@ -33,6 +33,9 @@ class Post(db.Model):
     title = db.Column(db.String(150), nullable=False)
     description = db.Column(db.String(300), nullable=False)
     category = db.Column(db.String(80), default='General')
+    price = db.Column(db.Numeric(10, 2))
+    condition = db.Column(db.String(80), default='Good')
+    status = db.Column(db.String(80), default='Available')
     image = db.Column(db.String(200))  # optional image path
     is_active = db.Column(db.Boolean, default=True)
 
