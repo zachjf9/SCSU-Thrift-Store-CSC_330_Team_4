@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Create Post | The Thrifty Owls{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Create a Listing</h1>
+    <p class="muted">Post an item you want to trade, donate, or sell to other students.</p>
+</section>
+
+<section class="card">
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        <div>
+            <label for="{{ form.title.id }}">{{ form.title.label.text }}</label>
+            {{ form.title() }}
+            {% if form.title.errors %}
+                <ul class="field-errors">
+                    {% for error in form.title.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.description.id }}">{{ form.description.label.text }}</label>
+            {{ form.description() }}
+            {% if form.description.errors %}
+                <ul class="field-errors">
+                    {% for error in form.description.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.image.id }}">{{ form.image.label.text }}</label>
+            {{ form.image() }}
+        </div>
+
+        {{ form.submit() }}
+    </form>
+</section>
+{% endblock %}
