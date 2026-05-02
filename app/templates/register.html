@@ -1,16 +1,43 @@
 {% extends 'base.html' %}
+
+{% block body_class %}landing-page{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block main_class %}landing-container landing-form-container{% endblock %}
+
 {% block content %}
-<h1>Register</h1>
-<form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.email.label }} {{ form.email() }}</p>
-    {% for error in form.email.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.username.label }} {{ form.username() }}</p>
-    {% for error in form.username.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.password.label }} {{ form.password() }}</p>
-    {% for error in form.password.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.confirm_password.label }} {{ form.confirm_password() }}</p>
-    {% for error in form.confirm_password.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.submit() }}</p>
-</form>
+<section class="landing-form-panel" aria-labelledby="register-title">
+    <h1>The Thrifty Owl Online</h1>
+    <h2 id="register-title">Sign Up</h2>
+
+    <form class="landing-form" method="post">
+        {{ form.hidden_tag() }}
+        <div class="field">
+            {{ form.email.label }}
+            {{ form.email() }}
+            {% for error in form.email.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.username.label }}
+            {{ form.username() }}
+            {% for error in form.username.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.password.label }}
+            {{ form.password() }}
+            {% for error in form.password.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.confirm_password.label }}
+            {{ form.confirm_password() }}
+            {% for error in form.confirm_password.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        </div>
+        {{ form.submit() }}
+    </form>
+
+    <p class="landing-form-link">
+        Already have an account? <a href="{{ url_for('main.login') }}">Login</a>
+    </p>
+</section>
 {% endblock %}

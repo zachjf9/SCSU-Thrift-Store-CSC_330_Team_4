@@ -1,29 +1,57 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h1>Profile</h1>
-<form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.name.label }} {{ form.name() }}</p>
-    <p>{{ form.major.label }} {{ form.major() }}</p>
-    <p>{{ form.interests.label }} {{ form.interests(rows=4) }}</p>
-    <p>{{ form.submit() }}</p>
-</form>
+<section class="page-header">
+    <h1>Profile</h1>
+    <p class="muted">Update your student profile.</p>
+</section>
 
-<h2>Reviews About You</h2>
-{% for review in received_reviews %}
-<p>{{ review.rating }}/5 by {{ review.reviewer.username }}: {{ review.comment }}</p>
-{% else %}
-<p>No reviews.</p>
-{% endfor %}
+<section class="card form-card">
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="field">
+            {{ form.name.label }}
+            {{ form.name() }}
+        </div>
+        <div class="field">
+            {{ form.major.label }}
+            {{ form.major() }}
+        </div>
+        <div class="field">
+            {{ form.interests.label }}
+            {{ form.interests(rows=4) }}
+        </div>
+        {{ form.submit() }}
+    </form>
+</section>
 
-<h2>Your Reviews</h2>
-{% for review in authored_reviews %}
-<p>{{ review.rating }}/5 for {{ review.reviewed.username }}: {{ review.comment }}</p>
-<p><a href="{{ url_for('main.edit_review', review_id=review.id) }}">Edit</a></p>
-<form method="post" action="{{ url_for('main.delete_review', review_id=review.id) }}">
-    <input type="submit" value="Delete">
-</form>
-{% else %}
-<p>No reviews.</p>
-{% endfor %}
+<section>
+    <h2>Reviews About You</h2>
+    {% for review in received_reviews %}
+    <div class="card review-row">
+        <strong>{{ review.rating }}/5 by {{ review.reviewer.username }}</strong>
+        <p>{{ review.comment }}</p>
+    </div>
+    {% else %}
+    <p class="empty">No reviews.</p>
+    {% endfor %}
+</section>
+
+<section>
+    <h2>Your Reviews</h2>
+    {% for review in authored_reviews %}
+    <div class="card review-row">
+        <strong>{{ review.rating }}/5 for {{ review.reviewed.username }}</strong>
+        <p>{{ review.comment }}</p>
+        <div class="actions">
+            <a class="button secondary" href="{{ url_for('main.edit_review', review_id=review.id) }}">Edit</a>
+            <form class="inline-form" method="post" action="{{ url_for('main.delete_review', review_id=review.id) }}">
+                <input type="submit" value="Delete">
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <p class="empty">No reviews.</p>
+    {% endfor %}
+</section>
 {% endblock %}

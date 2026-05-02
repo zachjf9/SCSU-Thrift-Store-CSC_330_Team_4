@@ -1,16 +1,34 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h1>Edit User</h1>
-<form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.email.label }} {{ form.email() }}</p>
-    {% for error in form.email.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.username.label }} {{ form.username() }}</p>
-    {% for error in form.username.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.name.label }} {{ form.name() }}</p>
-    <p>{{ form.major.label }} {{ form.major() }}</p>
-    <p>{{ form.is_admin() }} {{ form.is_admin.label }}</p>
-    <p>{{ form.is_blocked() }} {{ form.is_blocked.label }}</p>
-    <p>{{ form.submit() }}</p>
-</form>
+<section class="page-header">
+    <h1>Edit User</h1>
+</section>
+
+<section class="card form-card">
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="field">
+            {{ form.email.label }}
+            {{ form.email() }}
+            {% for error in form.email.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.username.label }}
+            {{ form.username() }}
+            {% for error in form.username.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.name.label }}
+            {{ form.name() }}
+        </div>
+        <div class="field">
+            {{ form.major.label }}
+            {{ form.major() }}
+        </div>
+        <label>{{ form.is_admin() }} {{ form.is_admin.label.text }}</label>
+        <label>{{ form.is_blocked() }} {{ form.is_blocked.label.text }}</label>
+        {{ form.submit() }}
+    </form>
+</section>
 {% endblock %}

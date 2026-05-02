@@ -1,12 +1,41 @@
 {% extends 'base.html' %}
+
+{% block body_class %}landing-page{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block main_class %}landing-container landing-form-container{% endblock %}
+
+{% block flash_messages %}{% endblock %}
+
 {% block content %}
-<h1>Login</h1>
-<form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.email.label }} {{ form.email() }}</p>
-    {% for error in form.email.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.password.label }} {{ form.password() }}</p>
-    {% for error in form.password.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.submit() }}</p>
-</form>
+<section class="landing-form-panel" aria-labelledby="login-title">
+    <h1>The Thrifty Owl Online</h1>
+    <h2 id="login-title">Login</h2>
+
+    {% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+    <div class="flash landing-flash">{{ message }}</div>
+    {% endfor %}
+    {% endwith %}
+
+    <form class="landing-form" method="post">
+        {{ form.hidden_tag() }}
+        <div class="field">
+            {{ form.email.label }}
+            {{ form.email() }}
+            {% for error in form.email.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.password.label }}
+            {{ form.password() }}
+            {% for error in form.password.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        </div>
+        {{ form.submit() }}
+    </form>
+
+    <p class="landing-form-link">
+        Need an account? <a href="{{ url_for('main.register') }}">Sign Up</a>
+    </p>
+</section>
 {% endblock %}

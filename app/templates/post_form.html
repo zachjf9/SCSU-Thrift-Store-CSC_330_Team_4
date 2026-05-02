@@ -1,13 +1,28 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h1>{{ title }}</h1>
-<form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.title.label }} {{ form.title() }}</p>
-    {% for error in form.title.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.category.label }} {{ form.category() }}</p>
-    <p>{{ form.description.label }} {{ form.description(rows=5) }}</p>
-    {% for error in form.description.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.submit() }}</p>
-</form>
+<section class="page-header">
+    <h1>{{ title }}</h1>
+</section>
+
+<section class="card form-card">
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="field">
+            {{ form.title.label }}
+            {{ form.title() }}
+            {% for error in form.title.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.category.label }}
+            {{ form.category() }}
+        </div>
+        <div class="field">
+            {{ form.description.label }}
+            {{ form.description(rows=5) }}
+            {% for error in form.description.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        </div>
+        {{ form.submit() }}
+    </form>
+</section>
 {% endblock %}

@@ -1,24 +1,54 @@
 {% extends 'base.html' %}
-{% block content %}
-<h1>Listings</h1>
 
-<form method="get">
-    Search: <input name="q" value="{{ search }}">
-    Category:
-    <select name="category">
-        <option value="">All</option>
-        {% for category in categories %}
-        <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>{{ category }}</option>
-        {% endfor %}
-    </select>
-    <input type="submit" value="Search">
-</form>
+{% block body_class %}{% if not current_user.is_authenticated %}landing-page{% endif %}{% endblock %}
+
+{% block header %}
+{% if current_user.is_authenticated %}
+{{ super() }}
+{% endif %}
+{% endblock %}
+
+{% block main_class %}{% if current_user.is_authenticated %}container{% else %}landing-container{% endif %}{% endblock
+%}
+
+{% block content %}
+{% if not current_user.is_authenticated %}
+{% include 'landingPage.html' %}
+{% else %}
+<section class="page-header">
+    <h1>Listings</h1>
+    <p class="muted">Browse items posted by other students.</p>
+</section>
+
+<section class="card">
+    <form class="toolbar" method="get">
+        <div class="field">
+            <label for="q">Search</label>
+            <input id="q" name="q" value="{{ search }}">
+        </div>
+        <div class="field">
+            <label for="category">Category</label>
+            <select id="category" name="category">
+                <option value="">All</option>
+                {% for category in categories %}
+                <option value="{{ category }}" {% if category==selected_category %}selected{% endif %}>{{ category }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <input type="submit" value="Search">
+    </form>
+</section>
 
 {% for post in posts %}
-<h3><a href="{{ url_for('main.view_post', post_id=post.id) }}">{{ post.title }}</a></h3>
-<p>{{ post.description }}</p>
-<p>{{ post.category }} - {{ post.owner.username }}</p>
+<article class="card listing">
+    <h2><a href="{{ url_for('main.view_post', post_id=post.id) }}">{{ post.title }}</a></h2>
+    <p>{{ post.description }}</p>
+    <p class="meta">{{ post.category }} posted by {{ post.owner.username }}</p>
+    <a class="button" href="{{ url_for('main.view_post', post_id=post.id) }}">View Listing</a>
+</article>
 {% else %}
-<p>No listings.</p>
+<p class="empty">No listings found.</p>
 {% endfor %}
+{% endif %}
 {% endblock %}

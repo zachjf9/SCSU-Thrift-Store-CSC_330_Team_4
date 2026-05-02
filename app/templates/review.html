@@ -1,12 +1,24 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h1>{{ title or 'Review' }} {{ user.username }}</h1>
-<form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.rating.label }} {{ form.rating() }}</p>
-    {% for error in form.rating.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.comment.label }} {{ form.comment(rows=4) }}</p>
-    {% for error in form.comment.errors %}<p>{{ error }}</p>{% endfor %}
-    <p>{{ form.submit() }}</p>
-</form>
+<section class="page-header">
+    <h1>{{ title or 'Review' }} {{ user.username }}</h1>
+</section>
+
+<section class="card form-card">
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="field">
+            {{ form.rating.label }}
+            {{ form.rating() }}
+            {% for error in form.rating.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="field">
+            {{ form.comment.label }}
+            {{ form.comment(rows=4) }}
+            {% for error in form.comment.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        </div>
+        {{ form.submit() }}
+    </form>
+</section>
 {% endblock %}

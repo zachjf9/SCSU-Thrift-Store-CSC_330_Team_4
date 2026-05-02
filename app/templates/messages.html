@@ -1,9 +1,16 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h1>Messages</h1>
+<section class="page-header">
+    <h1>Messages</h1>
+</section>
+
 {% for message in messages %}
-<p>From {{ message.sender.username }}: {{ message.content }}</p>
+<div class="card message-row">
+    <strong>From {{ message.sender.username }}</strong>
+    <p>{{ message.content }}</p>
+</div>
 {% else %}
-<p>No messages.</p>
+<p class="empty">No messages.</p>
 {% endfor %}
 {% endblock %}
