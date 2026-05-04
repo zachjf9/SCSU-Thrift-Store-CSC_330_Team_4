@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }} | The Thrifty Owls{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>{{ user.username }}</h1>
+    <p class="muted">View this user's profile, listings, and reviews.</p>
+</section>
+
+<section class="card">
+    <h2>Profile Info</h2>
+    <p><strong>Full Name:</strong> {{ user.name or 'Not added yet' }}</p>
+    <p><strong>Major:</strong> {{ user.major or 'Not added yet' }}</p>
+    <p><strong>Interests:</strong> {{ user.interests or 'Not added yet' }}</p>
+</section>
+
+<section class="card">
+    <h2>Listings</h2>
+    {% for post in listings %}
+        <p><a href="{{ url_for('main.view_post', post_id=post.id) }}">{{ post.title }}</a> - {{ post.status or 'Available' }}</p>
+    {% else %}
+        <p class="muted">No active listings.</p>
+    {% endfor %}
+</section>
+
+<section class="card">
+    <h2>Reviews</h2>
+    {% for review in reviews %}
+        <p>{{ review.rating }}/5 by <a href="{{ url_for('main.view_profile', user_id=review.reviewer_id) }}">{{ review.reviewer.username }}</a>: {{ review.comment }}</p>
+    {% else %}
+        <p class="muted">No reviews.</p>
+    {% endfor %}
+</section>
+{% endblock %}

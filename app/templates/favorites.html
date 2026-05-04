@@ -21,7 +21,7 @@
                             <span>${{ "%.2f"|format(post.price) }}</span>
                         {% endif %}
                         <span>{{ post.status or 'Available' }}</span>
-                        <span>Posted by {{ post.owner.username }}</span>
+                        <span>Posted by <a href="{{ url_for('main.view_profile', user_id=post.owner_id) }}">{{ post.owner.username }}</a></span>
                     </div>
                     <form method="post" action="{{ url_for('main.unfavorite_post', post_id=post.id) }}">
                         <input type="submit" value="Remove Favorite">

@@ -22,7 +22,7 @@
             {% endif %}
             <span>{{ post.condition or 'Good' }}</span>
             <span>{{ post.status or 'Available' }}</span>
-            <span>Owner: {{ post.owner.username }}</span>
+            <span>Owner: <a href="{{ url_for('main.view_profile', user_id=post.owner_id) }}">{{ post.owner.username }}</a></span>
         </div>
 
         {% if post.owner_id == current_user.id or current_user.is_admin %}

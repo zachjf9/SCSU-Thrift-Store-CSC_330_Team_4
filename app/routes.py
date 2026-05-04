@@ -5,6 +5,7 @@ from uuid import uuid4
 
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
+from sqlalchemy import or_
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
@@ -145,6 +146,23 @@ def profile():
     return render_template('profile.html', form=form, received_reviews=received_reviews, authored_reviews=authored_reviews)
 
 
+@main.route('/profile/<int:user_id>')
+@login_required
+def view_profile(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        return redirect(url_for('main.profile'))
+
+    listings = (
+        Post.query
+        .filter_by(owner_id=user.id, is_active=True)
+        .order_by(Post.timestamp.desc())
+        .all()
+    )
+    reviews = Review.query.filter_by(reviewed_id=user.id).order_by(Review.timestamp.desc()).all()
+    return render_template('view_profile.html', user=user, listings=listings, reviews=reviews)
+
+
 @main.route('/create-post', methods=['GET', 'POST'])
 @login_required
 def create_post():
@@ -279,8 +297,80 @@ def delete_post(post_id):
 @main.route('/messages')
 @login_required
 def messages():
-    inbox = Message.query.filter_by(receiver_id=current_user.id).order_by(Message.timestamp.desc()).all()
-    return render_template('messages.html', messages=inbox)
+    all_messages = (
+        Message.query
+        .filter(or_(Message.sender_id == current_user.id, Message.receiver_id == current_user.id))
+        .order_by(Message.timestamp.asc())
+        .all()
+    )
+
+    conversations_by_user = {}
+    for message in all_messages:
+        other_user = message.receiver if message.sender_id == current_user.id else message.sender
+        conversations_by_user.setdefault(other_user.id, {
+            'user': other_user,
+            'messages': [],
+            'last_message': None,
+        })
+        conversations_by_user[other_user.id]['messages'].append(message)
+        conversations_by_user[other_user.id]['last_message'] = message
+
+    conversations = sorted(
+        conversations_by_user.values(),
+        key=lambda conversation: conversation['last_message'].timestamp,
+        reverse=True,
+    )
+
+    form = MessageForm()
+    return render_template('messages.html', conversations=conversations, form=form)
+
+
+@main.route('/messages/<int:message_id>/reply', methods=['POST'])
+@login_required
+def reply_message(message_id):
+    original_message = Message.query.get_or_404(message_id)
+    if original_message.receiver_id != current_user.id:
+        flash('You can only reply to messages sent to you.')
+        return redirect(url_for('main.messages'))
+
+    form = MessageForm()
+    if form.validate_on_submit():
+        reply = Message(
+            sender_id=current_user.id,
+            receiver_id=original_message.sender_id,
+            content=form.message.data,
+        )
+        db.session.add(reply)
+        db.session.commit()
+        flash('Reply sent!')
+    else:
+        flash('Reply cannot be empty.')
+
+    return redirect(url_for('main.messages'))
+
+
+@main.route('/messages/user/<int:user_id>/reply', methods=['POST'])
+@login_required
+def reply_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        flash('You cannot message yourself.')
+        return redirect(url_for('main.messages'))
+
+    form = MessageForm()
+    if form.validate_on_submit():
+        reply = Message(
+            sender_id=current_user.id,
+            receiver_id=user.id,
+            content=form.message.data,
+        )
+        db.session.add(reply)
+        db.session.commit()
+        flash('Reply sent!')
+    else:
+        flash('Reply cannot be empty.')
+
+    return redirect(url_for('main.messages'))
 
 
 @main.route('/review/<int:user_id>', methods=['GET', 'POST'])

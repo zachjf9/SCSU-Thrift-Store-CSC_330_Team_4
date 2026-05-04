@@ -5,19 +5,40 @@
 {% block content %}
 <section class="hero">
     <h1>Your Messages</h1>
-    <p class="muted">Messages from other students about your listings show up here.</p>
+    <p class="muted">Expand a conversation to see the full message chain.</p>
 </section>
 
 <section>
-    {% for message in messages %}
-        <article class="card">
-            <h3>From {{ message.sender.username }}</h3>
-            <p>{{ message.content }}</p>
-            <div class="meta">
-                <span>{{ message.timestamp.strftime('%b %d, %Y at %I:%M %p') }}</span>
-                <span><a href="{{ url_for('main.review', user_id=message.sender.id) }}">Leave a review</a></span>
-            </div>
-        </article>
+    {% for conversation in conversations %}
+        <details class="card">
+            <summary>
+                <strong>{{ conversation.user.username }}</strong>:
+                {% if conversation.last_message.sender_id == current_user.id %}
+                    You: {{ conversation.last_message.content }}
+                {% else %}
+                    {{ conversation.last_message.content }}
+                {% endif %}
+                <span class="muted">{{ conversation.last_message.timestamp.strftime('%b %d, %Y at %I:%M %p') }}</span>
+            </summary>
+
+            {% for message in conversation.messages %}
+                <p>
+                    <strong>{% if message.sender_id == current_user.id %}You{% else %}{{ message.sender.username }}{% endif %}:</strong>
+                    {{ message.content }}
+                    <br>
+                    <span class="muted">{{ message.timestamp.strftime('%b %d, %Y at %I:%M %p') }}</span>
+                </p>
+            {% endfor %}
+
+            <form method="post" action="{{ url_for('main.reply_user', user_id=conversation.user.id) }}">
+                {{ form.hidden_tag() }}
+                <div>
+                    <label for="reply-{{ conversation.user.id }}">Reply</label>
+                    {{ form.message(id='reply-' ~ conversation.user.id, rows=3) }}
+                </div>
+                <p><input type="submit" value="Send Reply"></p>
+            </form>
+        </details>
     {% else %}
         <div class="empty">Your inbox is empty right now.</div>
     {% endfor %}
