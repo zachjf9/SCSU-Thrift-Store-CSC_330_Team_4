@@ -1,3 +1,5 @@
+/* ==================== VARIABLES ==================== */
+
 :root {
     --blue: #016ABD;
     --blue-dark: #003399;
@@ -12,7 +14,7 @@
     --danger: #a82222;
 }
 
-/* -------------------- BASE -------------------- */
+/* ==================== BASE ==================== */
 
 * {
     box-sizing: border-box;
@@ -28,9 +30,10 @@ body {
 
 a {
     color: var(--blue);
+    text-decoration: none;
 }
 
-/* -------------------- LAYOUT -------------------- */
+/* ==================== LAYOUT ==================== */
 
 .container {
     max-width: 900px;
@@ -48,27 +51,27 @@ body.landing-page {
     min-height: 100vh;
 }
 
-/* -------------------- TOPBAR -------------------- */
+/* ==================== TOPBAR ==================== */
 
 .topbar {
     background: var(--blue);
     color: white;
     padding: 12px 20px;
-}
 
-.topbar-inner {
-    max-width: 900px;
-    margin: 0 auto;
     display: flex;
     justify-content: space-between;
-    gap: 16px;
+    align-items: center;
+}
+
+.topbar-left,
+.topbar-right {
+    display: flex;
     align-items: center;
 }
 
 .brand {
     color: white;
     font-weight: bold;
-    text-decoration: none;
 }
 
 .nav {
@@ -79,10 +82,9 @@ body.landing-page {
 
 .nav a {
     color: white;
-    text-decoration: none;
 }
 
-/* -------------------- LANDING PAGE -------------------- */
+/* ==================== LANDING PAGE ==================== */
 
 .landing-container {
     min-height: 100vh;
@@ -120,14 +122,13 @@ body.landing-page {
     color: white;
     font-size: 1.6rem;
     font-weight: bold;
-    text-decoration: none;
 }
 
 .landing-button:hover {
     background: var(--blue-dark);
 }
 
-/* -------------------- FORMS -------------------- */
+/* ==================== FORMS ==================== */
 
 form {
     display: grid;
@@ -143,11 +144,7 @@ label {
     font-weight: bold;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="file"],
+input,
 select,
 textarea {
     width: 100%;
@@ -161,7 +158,7 @@ textarea {
     min-height: 100px;
 }
 
-/* -------------------- BUTTONS -------------------- */
+/* ==================== BUTTONS ==================== */
 
 input[type="submit"],
 button,
@@ -172,7 +169,6 @@ button,
     border-radius: 4px;
     padding: 9px 14px;
     font: inherit;
-    text-decoration: none;
     cursor: pointer;
     width: fit-content;
 }
@@ -188,7 +184,18 @@ button:hover,
     color: var(--text);
 }
 
-/* -------------------- COMPONENTS -------------------- */
+/* Danger variant */
+.button.danger,
+input[type="submit"].danger {
+    background: var(--danger);
+}
+
+.button.danger:hover,
+input[type="submit"].danger:hover {
+    filter: brightness(0.9);
+}
+
+/* ==================== COMPONENTS ==================== */
 
 .card {
     background: var(--card);
@@ -216,7 +223,7 @@ button:hover,
     text-align: center;
 }
 
-/* -------------------- TEXT / UTILS -------------------- */
+/* ==================== TEXT / UTILS ==================== */
 
 .muted {
     color: var(--muted);
@@ -231,7 +238,7 @@ button:hover,
     display: inline;
 }
 
-/* -------------------- PAGE ELEMENTS -------------------- */
+/* ==================== PAGE ELEMENTS ==================== */
 
 .page-header {
     margin-bottom: 16px;
@@ -258,16 +265,9 @@ button:hover,
     font-size: 0.9rem;
 }
 
-/* -------------------- LAYOUT HELPERS -------------------- */
+/* ==================== LAYOUT HELPERS ==================== */
 
-.toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: end;
-    justify-content: center;
-}
-
+.toolbar,
 .actions {
     display: flex;
     flex-wrap: wrap;
@@ -283,7 +283,7 @@ button:hover,
     gap: 6px;
 }
 
-/* -------------------- LANDING FORM VARIANT -------------------- */
+/* ==================== LANDING FORM ==================== */
 
 .landing-form-container {
     align-items: flex-start;
@@ -297,13 +297,11 @@ button:hover,
 
 .landing-form-panel h1 {
     margin: 0 0 28px;
-    color: #000;
     font-size: 2.1rem;
 }
 
 .landing-form-panel h2 {
     margin: 0 0 20px;
-    color: #000;
     font-size: 1.6rem;
 }
 
@@ -316,63 +314,25 @@ button:hover,
     width: 180px;
     min-height: 70px;
     margin-top: 8px;
-    background: var(--blue);
     font-size: 1.35rem;
     font-weight: bold;
 }
 
 .landing-form-link {
     color: var(--blue-dark);
-    margin: 22px 0 0;
+    margin-top: 22px;
 }
 
 .landing-flash {
-    margin: 0 0 18px;
+    margin-bottom: 18px;
     text-align: center;
 }
 
-/* -------------------- RESPONSIVE -------------------- */
-
-@media (max-width: 650px) {
-
-    .topbar-inner {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .toolbar {
-        display: grid;
-    }
-
-    .landing-container {
-        padding-top: 14vh;
-    }
-
-    .landing-panel h1 {
-        font-size: 1.8rem;
-    }
-
-    .landing-button {
-        width: 168px;
-        min-height: 76px;
-        font-size: 1.45rem;
-    }
-
-    .landing-form-container {
-        padding-top: 10vh;
-    }
-
-    .landing-form-panel h1 {
-        font-size: 1.8rem;
-    }
-}
-
-/* -------------------- BUTTON -------------------- */
+/* ==================== FORM CENTER ==================== */
 
 .form-center {
     display: flex;
     justify-content: center;
-    align-items: center;
     margin-top: 10px;
 }
 
@@ -385,14 +345,44 @@ button:hover,
     margin-top: 8px;
 }
 
-/* Danger button variant */
-.button.danger,
-input[type="submit"].danger {
-    background: var(--danger);
-    color: white;
-}
+/* ==================== RESPONSIVE ==================== */
 
-.button.danger:hover,
-input[type="submit"].danger:hover {
-    filter: brightness(0.9);
+@media (max-width: 650px) {
+    .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .topbar-right {
+        width: 100%;
+    }
+
+    .nav {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .toolbar {
+        display: grid;
+    }
+
+    .landing-container {
+        padding-top: 14vh;
+    }
+
+    .landing-panel h1,
+    .landing-form-panel h1 {
+        font-size: 1.8rem;
+    }
+
+    .landing-button {
+        width: 168px;
+        min-height: 76px;
+        font-size: 1.45rem;
+    }
+
+    .landing-form-container {
+        padding-top: 10vh;
+    }
 }

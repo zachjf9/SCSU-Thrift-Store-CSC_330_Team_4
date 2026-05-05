@@ -13,11 +13,10 @@
         <h2>Listing Details</h2>
 
         {% if post.image %}
-            <p>
-                <img src="{{ url_for('static', filename='uploads/' ~ post.image) }}"
-                     alt="{{ post.title }}"
-                     style="max-width: 50%; border-radius: 16px;">
-            </p>
+        <p>
+            <img src="{{ url_for('static', filename='uploads/' ~ post.image) }}" alt="{{ post.title }}"
+                style="max-width: 50%; border-radius: 16px;">
+        </p>
         {% endif %}
 
         <p>{{ post.description }}</p>
@@ -25,7 +24,7 @@
         <div class="meta">
             <span>{{ post.category }}</span>
             {% if post.price is not none %}
-                <span>${{ "%.2f"|format(post.price) }}</span>
+            <span>${{ "%.2f"|format(post.price) }}</span>
             {% endif %}
             <span>{{ post.condition or 'Good' }}</span>
             <span>{{ post.status or 'Available' }}</span>
@@ -39,71 +38,66 @@
 
         {% if post.owner_id == current_user.id or current_user.is_admin %}
 
-            <div class="form-center">
-                <a class="button secondary"
-                   href="{{ url_for('main.edit_post', post_id=post.id) }}">
-                    Edit Listing
-                </a>
-            </div>
+        <div class="form-center">
+            <a class="button secondary" href="{{ url_for('main.edit_post', post_id=post.id) }}">
+                Edit Listing
+            </a>
+        </div>
 
-            <div class="form-center">
-                <form method="post"
-                      action="{{ url_for('main.delete_post', post_id=post.id) }}">
-                    <input type="submit" value="Delete Listing" class="button danger">
-                </form>
-            </div>
+        <div class="form-center">
+            <form method="post" action="{{ url_for('main.delete_post', post_id=post.id) }}">
+                <input type="submit" value="Delete Listing" class="button danger">
+            </form>
+        </div>
 
         {% elif is_favorite %}
 
-            <div class="form-center">
-                <form method="post"
-                      action="{{ url_for('main.unfavorite_post', post_id=post.id) }}">
-                    <input type="submit" value="Remove Favorite" class="button secondary">
-                </form>
-            </div>
+        <div class="form-center">
+            <form method="post" action="{{ url_for('main.unfavorite_post', post_id=post.id) }}">
+                <input type="submit" value="Remove Favorite" class="button secondary">
+            </form>
+        </div>
 
         {% else %}
 
-            <div class="form-center">
-                <form method="post"
-                      action="{{ url_for('main.favorite_post', post_id=post.id) }}">
-                    <input type="submit" value="Favorite" class="button">
-                </form>
-            </div>
+        <div class="form-center">
+            <form method="post" action="{{ url_for('main.favorite_post', post_id=post.id) }}">
+                <input type="submit" value="Favorite" class="button">
+            </form>
+        </div>
 
         {% endif %}
     </section>
 
     <section class="card">
         {% if post.owner_id != current_user.id %}
-            <h2>Send a Message</h2>
+        <h2>Send a Message</h2>
 
-            <form method="post">
-                {{ form.hidden_tag() }}
+        <form method="post">
+            {{ form.hidden_tag() }}
 
-                <div>
-                    <label for="{{ form.message.id }}">{{ form.message.label.text }}</label>
-                    {{ form.message(rows=4) }}
-                    {% for error in form.message.errors %}
-                        <p class="field-errors">{{ error }}</p>
-                    {% endfor %}
-                </div>
-
-                <div class="form-center">
-                    {{ form.submit(class="button") }}
-                </div>
-            </form>
-
-            <div class="form-center">
-                <a class="button secondary"
-                   href="{{ url_for('main.review', user_id=post.owner_id) }}">
-                    Review User
-                </a>
+            <div>
+                <label for="{{ form.message.id }}">{{ form.message.label.text }}</label>
+                {{ form.message(rows=4) }}
+                {% for error in form.message.errors %}
+                <p class="field-errors">{{ error }}</p>
+                {% endfor %}
             </div>
 
+            <div class="form-center">
+                {{ form.submit(class="button") }}
+            </div>
+        </form>
+
+        <div class="form-center">
+            <a class="button secondary" href="{{ url_for('main.review', user_id=post.owner_id) }}">
+                Review User
+            </a>
+        </div>
+
         {% else %}
-            <h2>Your Listing</h2>
-            <p class="muted">This is your listing, so the message form is hidden.</p>
+        <h2>Your Listing</h2>
+        <p class="muted">This is your listing, so the message form is hidden.</p>
         {% endif %}
     </section>
 </div>
@@ -112,9 +106,9 @@
     <h2>Reviews</h2>
 
     {% for review in reviews %}
-        <p>{{ review.rating }}/5 by {{ review.reviewer.username }}: {{ review.comment }}</p>
+    <p>{{ review.rating }}/5 by {{ review.reviewer.username }}: {{ review.comment }}</p>
     {% else %}
-        <p class="muted">No reviews yet.</p>
+    <p class="muted">No reviews yet.</p>
     {% endfor %}
 </section>
 {% endblock %}

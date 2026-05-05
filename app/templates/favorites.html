@@ -24,9 +24,11 @@
                 <span>Posted by <a href="{{ url_for('main.view_profile', user_id=post.owner_id) }}">{{
                         post.owner.username }}</a></span>
             </div>
-            <form method="post" action="{{ url_for('main.unfavorite_post', post_id=post.id) }}">
-                <input type="submit" value="Remove Favorite">
-            </form>
+            <div class="form-center">
+                <form method="post" action="{{ url_for('main.unfavorite_post', post_id=post.id) }}">
+                    <input type="submit" value="Remove Favorite" class="button danger">
+                </form>
+            </div>
         </article>
         {% endfor %}
     </div>
