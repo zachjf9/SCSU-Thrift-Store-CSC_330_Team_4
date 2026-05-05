@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -14,6 +16,7 @@ def create_app():
 
     db.init_app(app)
     login_manager.init_app(app)
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
     from . import routes
     app.register_blueprint(routes.main)  # FIXED
@@ -42,6 +45,9 @@ def ensure_schema():
         post_columns = {column['name'] for column in inspector.get_columns('post')}
         additions = {
             'category': "VARCHAR(80) DEFAULT 'General'",
+            'price': 'NUMERIC(10, 2)',
+            'condition': "VARCHAR(80) DEFAULT 'Good'",
+            'status': "VARCHAR(80) DEFAULT 'Available'",
             'is_active': 'BOOLEAN DEFAULT 1',
         }
         for name, definition in additions.items():

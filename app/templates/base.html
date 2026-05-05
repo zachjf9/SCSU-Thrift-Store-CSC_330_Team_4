@@ -1,48 +1,51 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}{{ title or 'The Thrifty Owl Online' }}{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}The Thrifty Owls{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
-<body class="{% block body_class %}{% endblock %}">
-    {% block header %}
-    <header class="topbar">
-        <div class="topbar-inner">
-            <a class="brand" href="{{ url_for('main.home') }}">The Thrifty Owl Online</a>
-            <nav class="nav">
-                <a href="{{ url_for('main.home') }}">Listings</a>
-                {% if current_user.is_authenticated %}
-                <a href="{{ url_for('main.create_post') }}">Create Listing</a>
-                <a href="{{ url_for('main.messages') }}">Messages</a>
-                <a href="{{ url_for('main.profile') }}">Profile</a>
-                {% if current_user.is_admin %}
-                <a href="{{ url_for('main.admin_users') }}">Manage Users</a>
-                {% endif %}
-                <a href="{{ url_for('main.logout') }}">Logout</a>
-                {% else %}
-                <a href="{{ url_for('main.login') }}">Login</a>
-                <a href="{{ url_for('main.register') }}">Register</a>
-                {% endif %}
-            </nav>
-        </div>
-    </header>
-    {% endblock %}
+<body>
+    <div class="shell">
+        <header class="topbar">
+            <div class="topbar-inner">
+                <a class="brand" href="{{ url_for('main.home') }}">The Thrifty Owls</a>
+                <nav class="nav">
+                    <a class="secondary" href="{{ url_for('main.home') }}">Home</a>
+                    {% if current_user.is_authenticated %}
+                    <a class="secondary" href="{{ url_for('main.create_post') }}">Create Listing</a>
+                    <a class="secondary" href="{{ url_for('main.favorites') }}">Favorites</a>
+                    <a class="secondary" href="{{ url_for('main.messages') }}">Messages</a>
+                    <a class="secondary" href="{{ url_for('main.profile') }}">Profile</a>
+                    {% if current_user.is_admin %}
+                    <a class="secondary" href="{{ url_for('main.admin_users') }}">Manage Users</a>
+                    {% endif %}
+                    <a href="{{ url_for('main.logout') }}">Logout</a>
+                    {% else %}
+                    <a class="secondary" href="{{ url_for('main.login') }}">Login</a>
+                    <a href="{{ url_for('main.register') }}">Register</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </header>
 
-    <main class="{% block main_class %}container{% endblock %}">
-        {% block flash_messages %}
-        {% with messages = get_flashed_messages() %}
-        {% for message in messages %}
-        <div class="flash">{{ message }}</div>
-        {% endfor %}
-        {% endwith %}
-        {% endblock %}
+        <main class="container">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="flash-list">
+                {% for message in messages %}
+                <div class="flash">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
 
-        {% block content %}{% endblock %}
-    </main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 </body>
 
 </html>

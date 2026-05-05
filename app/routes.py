@@ -1,14 +1,38 @@
 from functools import wraps
+from datetime import datetime, timedelta
+import os 
+from uuid import uuid4
 
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
+from sqlalchemy import or_
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
 from . import db
 from .forms import LoginForm, MessageForm, PostForm, ProfileForm, RegisterForm, ReviewForm, UserAdminForm
-from .models import Message, Notification, Post, Review, User
+from .models import Favorite, Message, Notification, Post, Review, User
 
 main = Blueprint('main', __name__)
+
+def allowed_image(filename):
+    allowed_extensions = current_app.config.get('ALLOWED_IMAGE_EXTENSIONS', set())
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+
+def save_listing_image(image_file):
+    if not image_file or not image_file.filename:
+        return None, None
+
+    if not allowed_image(image_file.filename):
+        return None, 'Please upload a PNG, JPG, JPEG, GIF, or WEBP image.'
+
+    original_name = secure_filename(image_file.filename)
+    extension = original_name.rsplit('.', 1)[1].lower()
+    filename = f'{uuid4().hex}.{extension}'
+    image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+    image_file.save(image_path)
+    return filename, None
 
 
 def admin_required(view):
@@ -28,16 +52,33 @@ def home():
     query = Post.query.filter_by(is_active=True)
     search = request.args.get('q', '').strip()
     category = request.args.get('category', '').strip()
+    date_filter = request.args.get('date_filter', '').strip()
 
     if search:
         pattern = f'%{search}%'
         query = query.filter((Post.title.ilike(pattern)) | (Post.description.ilike(pattern)))
     if category:
         query = query.filter_by(category=category)
+    if date_filter == '7':
+        query = query.filter(Post.timestamp >= datetime.utcnow() - timedelta(days=7))
+    elif date_filter == '30':
+        query = query.filter(Post.timestamp >= datetime.utcnow() - timedelta(days=30))
 
     posts = query.order_by(Post.timestamp.desc()).all()
     categories = [row[0] for row in db.session.query(Post.category).distinct().order_by(Post.category).all() if row[0]]
-    return render_template('index.html', posts=posts, categories=categories, search=search, selected_category=category)
+    favorite_post_ids = set()
+    if current_user.is_authenticated:
+        favorite_post_ids = {favorite.post_id for favorite in Favorite.query.filter_by(user_id=current_user.id).all()}
+
+    return render_template(
+        'index.html',
+        posts=posts,
+        categories=categories,
+        search=search,
+        selected_category=category,
+        selected_date_filter=date_filter,
+        favorite_post_ids=favorite_post_ids,
+    )
 
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -105,16 +146,42 @@ def profile():
     return render_template('profile.html', form=form, received_reviews=received_reviews, authored_reviews=authored_reviews)
 
 
+@main.route('/profile/<int:user_id>')
+@login_required
+def view_profile(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        return redirect(url_for('main.profile'))
+
+    listings = (
+        Post.query
+        .filter_by(owner_id=user.id, is_active=True)
+        .order_by(Post.timestamp.desc())
+        .all()
+    )
+    reviews = Review.query.filter_by(reviewed_id=user.id).order_by(Review.timestamp.desc()).all()
+    return render_template('view_profile.html', user=user, listings=listings, reviews=reviews)
+
+
 @main.route('/create-post', methods=['GET', 'POST'])
 @login_required
 def create_post():
     form = PostForm()
 
     if form.validate_on_submit():
+        image_filename, image_error = save_listing_image(form.image.data)
+        if image_error:
+            flash(image_error)
+            return render_template('post_form.html', form=form, title='Create Listing')
+
         post = Post(
             title=form.title.data,
             description=form.description.data,
             category=form.category.data,
+            price=form.price.data,
+            condition=form.condition.data,
+            status=form.status.data,
+            image=image_filename,
             owner_id=current_user.id,
         )
         db.session.add(post)
@@ -139,7 +206,48 @@ def view_post(post_id):
         return redirect(url_for('main.view_post', post_id=post.id))
 
     reviews = Review.query.filter_by(reviewed_id=post.owner_id).order_by(Review.timestamp.desc()).all()
-    return render_template('post.html', post=post, form=form, reviews=reviews)
+    is_favorite = Favorite.query.filter_by(user_id=current_user.id, post_id=post.id).first() is not None
+    return render_template('post.html', post=post, form=form, reviews=reviews, is_favorite=is_favorite)
+
+
+@main.route('/favorites')
+@login_required
+def favorites():
+    saved_posts = (
+        Post.query
+        .join(Favorite, Favorite.post_id == Post.id)
+        .filter(Favorite.user_id == current_user.id, Post.is_active == True)
+        .order_by(Favorite.timestamp.desc())
+        .all()
+    )
+    return render_template('favorites.html', posts=saved_posts)
+
+
+@main.route('/post/<int:post_id>/favorite', methods=['POST'])
+@login_required
+def favorite_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.owner_id == current_user.id:
+        flash('You cannot favorite your own listing.')
+        return redirect(url_for('main.view_post', post_id=post.id))
+
+    existing_favorite = Favorite.query.filter_by(user_id=current_user.id, post_id=post.id).first()
+    if not existing_favorite:
+        db.session.add(Favorite(user_id=current_user.id, post_id=post.id))
+        db.session.commit()
+        flash('Listing added to favorites.')
+
+    return redirect(request.referrer or url_for('main.view_post', post_id=post.id))
+
+
+@main.route('/post/<int:post_id>/unfavorite', methods=['POST'])
+@login_required
+def unfavorite_post(post_id):
+    favorite = Favorite.query.filter_by(user_id=current_user.id, post_id=post_id).first_or_404()
+    db.session.delete(favorite)
+    db.session.commit()
+    flash('Listing removed from favorites.')
+    return redirect(request.referrer or url_for('main.favorites'))
 
 
 @main.route('/post/<int:post_id>/edit', methods=['GET', 'POST'])
@@ -152,9 +260,19 @@ def edit_post(post_id):
 
     form = PostForm(obj=post)
     if form.validate_on_submit():
+        image_filename, image_error = save_listing_image(form.image.data)
+        if image_error:
+            flash(image_error)
+            return render_template('post_form.html', form=form, title='Edit Listing')
+
         post.title = form.title.data
         post.description = form.description.data
         post.category = form.category.data
+        post.price = form.price.data
+        post.condition = form.condition.data
+        post.status = form.status.data
+        if image_filename:
+            post.image = image_filename
         db.session.commit()
         flash('Listing updated!')
         return redirect(url_for('main.view_post', post_id=post.id))
@@ -179,8 +297,80 @@ def delete_post(post_id):
 @main.route('/messages')
 @login_required
 def messages():
-    inbox = Message.query.filter_by(receiver_id=current_user.id).order_by(Message.timestamp.desc()).all()
-    return render_template('messages.html', messages=inbox)
+    all_messages = (
+        Message.query
+        .filter(or_(Message.sender_id == current_user.id, Message.receiver_id == current_user.id))
+        .order_by(Message.timestamp.asc())
+        .all()
+    )
+
+    conversations_by_user = {}
+    for message in all_messages:
+        other_user = message.receiver if message.sender_id == current_user.id else message.sender
+        conversations_by_user.setdefault(other_user.id, {
+            'user': other_user,
+            'messages': [],
+            'last_message': None,
+        })
+        conversations_by_user[other_user.id]['messages'].append(message)
+        conversations_by_user[other_user.id]['last_message'] = message
+
+    conversations = sorted(
+        conversations_by_user.values(),
+        key=lambda conversation: conversation['last_message'].timestamp,
+        reverse=True,
+    )
+
+    form = MessageForm()
+    return render_template('messages.html', conversations=conversations, form=form)
+
+
+@main.route('/messages/<int:message_id>/reply', methods=['POST'])
+@login_required
+def reply_message(message_id):
+    original_message = Message.query.get_or_404(message_id)
+    if original_message.receiver_id != current_user.id:
+        flash('You can only reply to messages sent to you.')
+        return redirect(url_for('main.messages'))
+
+    form = MessageForm()
+    if form.validate_on_submit():
+        reply = Message(
+            sender_id=current_user.id,
+            receiver_id=original_message.sender_id,
+            content=form.message.data,
+        )
+        db.session.add(reply)
+        db.session.commit()
+        flash('Reply sent!')
+    else:
+        flash('Reply cannot be empty.')
+
+    return redirect(url_for('main.messages'))
+
+
+@main.route('/messages/user/<int:user_id>/reply', methods=['POST'])
+@login_required
+def reply_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        flash('You cannot message yourself.')
+        return redirect(url_for('main.messages'))
+
+    form = MessageForm()
+    if form.validate_on_submit():
+        reply = Message(
+            sender_id=current_user.id,
+            receiver_id=user.id,
+            content=form.message.data,
+        )
+        db.session.add(reply)
+        db.session.commit()
+        flash('Reply sent!')
+    else:
+        flash('Reply cannot be empty.')
+
+    return redirect(url_for('main.messages'))
 
 
 @main.route('/review/<int:user_id>', methods=['GET', 'POST'])

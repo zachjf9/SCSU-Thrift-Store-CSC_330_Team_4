@@ -1,28 +1,49 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | The Thrifty Owls{% endblock %}
 
 {% block content %}
 <section class="page-header">
     <h1>{{ title }}</h1>
+    <p class="muted">Add the details students need before they message you.</p>
 </section>
 
-<section class="card form-card">
-    <form method="post">
+<section class="card">
+    <form method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
-        <div class="field">
-            {{ form.title.label }}
+        <div>
+            <label for="{{ form.title.id }}">{{ form.title.label.text }}</label>
             {{ form.title() }}
-            {% for error in form.title.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+            {% for error in form.title.errors %}<p class="field-errors">{{ error }}</p>{% endfor %}
         </div>
-        <div class="field">
-            {{ form.category.label }}
+        <div>
+            <label for="{{ form.category.id }}">{{ form.category.label.text }}</label>
             {{ form.category() }}
         </div>
-        <div class="field">
-            {{ form.description.label }}
-            {{ form.description(rows=5) }}
-            {% for error in form.description.errors %}<p class="error-list">{{ error }}</p>{% endfor %}
+        <div>
+            <label for="{{ form.price.id }}">{{ form.price.label.text }}</label>
+            {{ form.price() }}
+            {% for error in form.price.errors %}<p class="field-errors">{{ error }}</p>{% endfor %}
         </div>
-        {{ form.submit() }}
+        <div>
+            <label for="{{ form.condition.id }}">{{ form.condition.label.text }}</label>
+            {{ form.condition() }}
+        </div>
+        <div>
+            <label for="{{ form.status.id }}">{{ form.status.label.text }}</label>
+            {{ form.status() }}
+        </div>
+        <div>
+            <label for="{{ form.image.id }}">{{ form.image.label.text }}</label>
+            {{ form.image() }}
+            {% for error in form.image.errors %}<p class="field-errors">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+            <label for="{{ form.description.id }}">{{ form.description.label.text }}</label>
+            {{ form.description(rows=5) }}
+            {% for error in form.description.errors %}<p class="field-errors">{{ error }}</p>{% endfor %}
+        </div>
+        <p>{{ form.submit() }}</p>
     </form>
 </section>
 {% endblock %}

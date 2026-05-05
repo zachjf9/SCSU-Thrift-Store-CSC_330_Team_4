@@ -1,6 +1,10 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block body_class %}{% if not current_user.is_authenticated %}landing-page{% endif %}{% endblock %}
+{% block title %}The Thrifty Owls{% endblock %}
+
+{% block body_class %}
+{% if not current_user.is_authenticated %}landing-page{% endif %}
+{% endblock %}
 
 {% block header %}
 {% if current_user.is_authenticated %}
@@ -8,47 +12,112 @@
 {% endif %}
 {% endblock %}
 
-{% block main_class %}{% if current_user.is_authenticated %}container{% else %}landing-container{% endif %}{% endblock
-%}
+{% block main_class %}
+{% if current_user.is_authenticated %}container{% else %}landing-container{% endif %}
+{% endblock %}
 
 {% block content %}
+
 {% if not current_user.is_authenticated %}
+
 {% include 'landingPage.html' %}
+
 {% else %}
-<section class="page-header">
-    <h1>Listings</h1>
+
+<section class="card">
+    <h1>The Thrifty Owls</h1>
     <p class="muted">Browse items posted by other students.</p>
+    <p>
+        <a class="button" href="{{ url_for('main.create_post') }}">
+            Post an Item
+        </a>
+    </p>
 </section>
 
 <section class="card">
-    <form class="toolbar" method="get">
+    <h2>Browse Listings</h2>
+    <form method="get" class="toolbar">
         <div class="field">
             <label for="q">Search</label>
             <input id="q" name="q" value="{{ search }}">
         </div>
+
         <div class="field">
             <label for="category">Category</label>
             <select id="category" name="category">
                 <option value="">All</option>
                 {% for category in categories %}
-                <option value="{{ category }}" {% if category==selected_category %}selected{% endif %}>{{ category }}
+                <option value="{{ category }}" {% if category==selected_category %}selected{% endif %}>
+                    {{ category }}
                 </option>
                 {% endfor %}
             </select>
         </div>
+
+        <div class="field">
+            <label for="date_filter">Date</label>
+            <select id="date_filter" name="date_filter">
+                <option value="" {% if not selected_date_filter %}selected{% endif %}>Any time</option>
+                <option value="7" {% if selected_date_filter=='7' %}selected{% endif %}>Last 7 days</option>
+                <option value="30" {% if selected_date_filter=='30' %}selected{% endif %}>Last 30 days</option>
+            </select>
+        </div>
+
         <input type="submit" value="Search">
     </form>
 </section>
 
-{% for post in posts %}
-<article class="card listing">
-    <h2><a href="{{ url_for('main.view_post', post_id=post.id) }}">{{ post.title }}</a></h2>
-    <p>{{ post.description }}</p>
-    <p class="meta">{{ post.category }} posted by {{ post.owner.username }}</p>
-    <a class="button" href="{{ url_for('main.view_post', post_id=post.id) }}">View Listing</a>
-</article>
-{% else %}
-<p class="empty">No listings found.</p>
-{% endfor %}
+<section class="page-header">
+    <h2>Recent Listings</h2>
+
+    {% if posts %}
+    <div class="grid">
+        {% for post in posts %}
+        <article class="card listing">
+            <h3>
+                <a href="{{ url_for('main.view_post', post_id=post.id) }}">
+                    {{ post.title }}
+                </a>
+            </h3>
+
+            <p>{{ post.description }}</p>
+
+            <div class="meta">
+                <span>{{ post.category }}</span>
+
+                {% if post.price is not none %}
+                <span>${{ "%.2f"|format(post.price) }}</span>
+                {% endif %}
+
+                <span>{{ post.status or 'Available' }}</span>
+
+                <span>
+                    Posted by
+                    <a href="{{ url_for('main.view_profile', user_id=post.owner_id) }}">
+                        {{ post.owner.username }}
+                    </a>
+                </span>
+            </div>
+
+            {% if current_user.is_authenticated and post.owner_id != current_user.id %}
+            {% if post.id in favorite_post_ids %}
+            <form method="post" action="{{ url_for('main.unfavorite_post', post_id=post.id) }}">
+                <input type="submit" value="Remove Favorite">
+            </form>
+            {% else %}
+            <form method="post" action="{{ url_for('main.favorite_post', post_id=post.id) }}">
+                <input type="submit" value="Favorite">
+            </form>
+            {% endif %}
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">No listings yet. Be the first student to add one.</div>
+    {% endif %}
+</section>
+
 {% endif %}
+
 {% endblock %}

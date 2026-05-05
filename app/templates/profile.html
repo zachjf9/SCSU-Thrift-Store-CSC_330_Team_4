@@ -1,57 +1,63 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}Profile | The Thrifty Owls{% endblock %}
 
 {% block content %}
 <section class="page-header">
-    <h1>Profile</h1>
-    <p class="muted">Update your student profile.</p>
+    <h1>Your Profile</h1>
+    <p class="muted">Keep your student info updated so other users know who they are talking to.</p>
 </section>
 
-<section class="card form-card">
-    <form method="post">
-        {{ form.hidden_tag() }}
-        <div class="field">
-            {{ form.name.label }}
-            {{ form.name() }}
-        </div>
-        <div class="field">
-            {{ form.major.label }}
-            {{ form.major() }}
-        </div>
-        <div class="field">
-            {{ form.interests.label }}
-            {{ form.interests(rows=4) }}
-        </div>
-        {{ form.submit() }}
-    </form>
-</section>
+<div class="grid two-col">
+    <section class="card">
+        <h2>Edit Profile</h2>
+        <form method="post">
+            {{ form.hidden_tag() }}
+            <div>
+                <label for="{{ form.name.id }}">{{ form.name.label.text }}</label>
+                {{ form.name() }}
+            </div>
+            <div>
+                <label for="{{ form.major.id }}">{{ form.major.label.text }}</label>
+                {{ form.major() }}
+            </div>
+            <div>
+                <label for="{{ form.interests.id }}">{{ form.interests.label.text }}</label>
+                {{ form.interests(rows=4) }}
+            </div>
+            <p>{{ form.submit() }}</p>
+        </form>
+    </section>
 
-<section>
+    <section class="card">
+        <h2>Current Info</h2>
+        <p><strong>Username:</strong> {{ current_user.username }}</p>
+        <p><strong>Email:</strong> {{ current_user.email }}</p>
+        <p><strong>Full Name:</strong> {{ current_user.name or 'Not added yet' }}</p>
+        <p><strong>Major:</strong> {{ current_user.major or 'Not added yet' }}</p>
+        <p><strong>Interests:</strong> {{ current_user.interests or 'Not added yet' }}</p>
+    </section>
+</div>
+
+<section class="card review-row">
     <h2>Reviews About You</h2>
     {% for review in received_reviews %}
-    <div class="card review-row">
-        <strong>{{ review.rating }}/5 by {{ review.reviewer.username }}</strong>
-        <p>{{ review.comment }}</p>
-    </div>
+        <p>{{ review.rating }}/5 by <a href="{{ url_for('main.view_profile', user_id=review.reviewer_id) }}">{{ review.reviewer.username }}</a>: {{ review.comment }}</p>
     {% else %}
-    <p class="empty">No reviews.</p>
+        <p class="muted">No reviews.</p>
     {% endfor %}
 </section>
 
-<section>
+<section class="card review-row">
     <h2>Your Reviews</h2>
     {% for review in authored_reviews %}
-    <div class="card review-row">
-        <strong>{{ review.rating }}/5 for {{ review.reviewed.username }}</strong>
-        <p>{{ review.comment }}</p>
-        <div class="actions">
-            <a class="button secondary" href="{{ url_for('main.edit_review', review_id=review.id) }}">Edit</a>
-            <form class="inline-form" method="post" action="{{ url_for('main.delete_review', review_id=review.id) }}">
-                <input type="submit" value="Delete">
-            </form>
-        </div>
-    </div>
+        <p>{{ review.rating }}/5 for <a href="{{ url_for('main.view_profile', user_id=review.reviewed_id) }}">{{ review.reviewed.username }}</a>: {{ review.comment }}</p>
+        <p><a href="{{ url_for('main.edit_review', review_id=review.id) }}">Edit</a></p>
+        <form method="post" action="{{ url_for('main.delete_review', review_id=review.id) }}">
+            <input type="submit" value="Delete">
+        </form>
     {% else %}
-    <p class="empty">No reviews.</p>
+        <p class="muted">No reviews.</p>
     {% endfor %}
 </section>
 {% endblock %}

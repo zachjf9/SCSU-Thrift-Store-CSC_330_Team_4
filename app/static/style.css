@@ -1,13 +1,18 @@
 :root {
     --blue: #016ABD;
     --blue-dark: #003399;
+
     --bg: #F4F4F4;
     --card: #ffffff;
     --border: #d8dde3;
+
     --text: #1a1a1a;
     --muted: #666666;
+
     --danger: #a82222;
 }
+
+/* -------------------- BASE -------------------- */
 
 * {
     box-sizing: border-box;
@@ -21,14 +26,29 @@ body {
     line-height: 1.4;
 }
 
-body.landing-page {
-    min-height: 100vh;
-    background: #f4f4f4;
-}
-
 a {
     color: var(--blue);
 }
+
+/* -------------------- LAYOUT -------------------- */
+
+.container {
+    max-width: 900px;
+    margin: 24px auto;
+    padding: 0 16px;
+    display: grid;
+    justify-items: center;
+}
+
+.container>* {
+    width: min(100%, 720px);
+}
+
+body.landing-page {
+    min-height: 100vh;
+}
+
+/* -------------------- TOPBAR -------------------- */
 
 .topbar {
     background: var(--blue);
@@ -62,17 +82,7 @@ a {
     text-decoration: none;
 }
 
-.container {
-    max-width: 900px;
-    margin: 24px auto;
-    padding: 0 16px;
-    display: grid;
-    justify-items: center;
-}
-
-.container>* {
-    width: min(100%, 720px);
-}
+/* -------------------- LANDING PAGE -------------------- */
 
 .landing-container {
     min-height: 100vh;
@@ -88,7 +98,7 @@ a {
 
 .landing-panel h1 {
     margin: 0 0 36px;
-    color: #000000;
+    color: #000;
     font-size: 2.1rem;
     line-height: 1.1;
 }
@@ -117,94 +127,7 @@ a {
     background: var(--blue-dark);
 }
 
-.landing-form-container {
-    align-items: flex-start;
-    padding-top: 12vh;
-}
-
-.landing-form-panel {
-    width: min(100%, 420px);
-    text-align: center;
-}
-
-.landing-form-panel h1 {
-    margin: 0 0 28px;
-    color: #000000;
-    font-size: 2.1rem;
-    line-height: 1.1;
-}
-
-.landing-form-panel h2 {
-    margin: 0 0 20px;
-    color: #000000;
-    font-size: 1.6rem;
-}
-
-.landing-form {
-    text-align: left;
-}
-
-.landing-form input[type="submit"] {
-    justify-self: center;
-    width: 180px;
-    min-height: 70px;
-    margin-top: 8px;
-    background: var(--blue);
-    font-size: 1.35rem;
-    font-weight: bold;
-}
-
-.landing-form-link {
-    color: var(--dark-blue);
-    margin: 22px 0 0;
-}
-
-.landing-flash {
-    margin: 0 0 18px;
-    text-align: center;
-}
-
-.card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 18px;
-    margin-bottom: 16px;
-    text-align: center;
-}
-
-.page-header {
-    margin-bottom: 16px;
-    text-align: center;
-}
-
-.page-header h1 {
-    margin: 0 0 6px;
-}
-
-.muted {
-    color: var(--muted);
-}
-
-.flash {
-    background: #fff8d8;
-    border: 1px solid #ead47a;
-    border-radius: 6px;
-    padding: 10px 12px;
-    margin-bottom: 12px;
-}
-
-.form-card {
-    max-width: 520px;
-}
-
-.form-card form {
-    text-align: left;
-}
-
-.form-card input[type="submit"] {
-    justify-self: center;
-}
+/* -------------------- FORMS -------------------- */
 
 form {
     display: grid;
@@ -238,10 +161,11 @@ textarea {
     min-height: 100px;
 }
 
+/* -------------------- BUTTONS -------------------- */
+
 input[type="submit"],
 button,
 .button {
-    width: fit-content;
     background: var(--blue);
     color: white;
     border: 0;
@@ -250,6 +174,7 @@ button,
     font: inherit;
     text-decoration: none;
     cursor: pointer;
+    width: fit-content;
 }
 
 input[type="submit"]:hover,
@@ -263,17 +188,58 @@ button:hover,
     color: var(--text);
 }
 
+/* -------------------- COMPONENTS -------------------- */
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.flash {
+    background: #fff8d8;
+    border: 1px solid #ead47a;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+}
+
+.empty {
+    padding: 16px;
+    color: var(--muted);
+    background: white;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    text-align: center;
+}
+
+/* -------------------- TEXT / UTILS -------------------- */
+
+.muted {
+    color: var(--muted);
+}
+
 .error-list {
     margin: 4px 0 0;
     color: var(--danger);
 }
 
-.toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: end;
-    justify-content: center;
+.inline-form {
+    display: inline;
+}
+
+/* -------------------- PAGE ELEMENTS -------------------- */
+
+.page-header {
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.page-header h1 {
+    margin: 0 0 6px;
 }
 
 .listing {
@@ -292,25 +258,22 @@ button:hover,
     font-size: 0.9rem;
 }
 
+/* -------------------- LAYOUT HELPERS -------------------- */
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: end;
+    justify-content: center;
+}
+
 .actions {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     align-items: center;
     justify-content: center;
-}
-
-.inline-form {
-    display: inline;
-}
-
-.empty {
-    padding: 16px;
-    color: var(--muted);
-    background: white;
-    border: 1px dashed var(--border);
-    border-radius: 6px;
-    text-align: center;
 }
 
 .user-row,
@@ -320,10 +283,61 @@ button:hover,
     gap: 6px;
 }
 
+/* -------------------- LANDING FORM VARIANT -------------------- */
+
+.landing-form-container {
+    align-items: flex-start;
+    padding-top: 12vh;
+}
+
+.landing-form-panel {
+    width: min(100%, 420px);
+    text-align: center;
+}
+
+.landing-form-panel h1 {
+    margin: 0 0 28px;
+    color: #000;
+    font-size: 2.1rem;
+}
+
+.landing-form-panel h2 {
+    margin: 0 0 20px;
+    color: #000;
+    font-size: 1.6rem;
+}
+
+.landing-form {
+    text-align: left;
+}
+
+.landing-form input[type="submit"] {
+    justify-self: center;
+    width: 180px;
+    min-height: 70px;
+    margin-top: 8px;
+    background: var(--blue);
+    font-size: 1.35rem;
+    font-weight: bold;
+}
+
+.landing-form-link {
+    color: var(--blue-dark);
+    margin: 22px 0 0;
+}
+
+.landing-flash {
+    margin: 0 0 18px;
+    text-align: center;
+}
+
+/* -------------------- RESPONSIVE -------------------- */
+
 @media (max-width: 650px) {
+
     .topbar-inner {
-        align-items: flex-start;
         flex-direction: column;
+        align-items: flex-start;
     }
 
     .toolbar {
@@ -351,4 +365,34 @@ button:hover,
     .landing-form-panel h1 {
         font-size: 1.8rem;
     }
+}
+
+/* -------------------- BUTTON -------------------- */
+
+.form-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.form-center form {
+    width: auto;
+    display: inline-block;
+}
+
+.form-center+.form-center {
+    margin-top: 8px;
+}
+
+/* Danger button variant */
+.button.danger,
+input[type="submit"].danger {
+    background: var(--danger);
+    color: white;
+}
+
+.button.danger:hover,
+input[type="submit"].danger:hover {
+    filter: brightness(0.9);
 }
