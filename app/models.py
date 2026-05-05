@@ -39,7 +39,7 @@ class Post(db.Model):
     image = db.Column(db.String(200))  # optional image path
     is_active = db.Column(db.Boolean, default=True)
 
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Foreign key
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -49,7 +49,7 @@ class Favorite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref=db.backref('favorites', lazy=True))
     post = db.relationship('Post', backref=db.backref('favorites', lazy=True))
@@ -63,7 +63,7 @@ class Message(db.Model):
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     content = db.Column(db.String(500), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 # Reviews
@@ -76,7 +76,7 @@ class Review(db.Model):
     rating = db.Column(db.Integer, nullable=False)  # 1–5
     comment = db.Column(db.String(300))
 
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 # Notifications
@@ -87,7 +87,7 @@ class Notification(db.Model):
     message = db.Column(db.String(300), nullable=False)
 
     is_read = db.Column(db.Boolean, default=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 # Logging in

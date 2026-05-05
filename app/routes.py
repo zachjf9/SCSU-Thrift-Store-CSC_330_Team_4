@@ -60,11 +60,11 @@ def home():
     if category:
         query = query.filter_by(category=category)
     if date_filter == '7':
-        query = query.filter(Post.timestamp >= datetime.utcnow() - timedelta(days=7))
+        query = query.filter(Post.created_at >= datetime.utcnow() - timedelta(days=7))
     elif date_filter == '30':
-        query = query.filter(Post.timestamp >= datetime.utcnow() - timedelta(days=30))
+        query = query.filter(Post.created_at >= datetime.utcnow() - timedelta(days=30))
 
-    posts = query.order_by(Post.timestamp.desc()).all()
+    posts = query.order_by(Post.created_at.desc()).all()
     categories = [row[0] for row in db.session.query(Post.category).distinct().order_by(Post.category).all() if row[0]]
     favorite_post_ids = set()
     if current_user.is_authenticated:
@@ -141,8 +141,8 @@ def profile():
         flash('Profile updated!')
         return redirect(url_for('main.profile'))
 
-    received_reviews = Review.query.filter_by(reviewed_id=current_user.id).order_by(Review.timestamp.desc()).all()
-    authored_reviews = Review.query.filter_by(reviewer_id=current_user.id).order_by(Review.timestamp.desc()).all()
+    received_reviews = Review.query.filter_by(reviewed_id=current_user.id).order_by(Review.created_at.desc()).all()
+    authored_reviews = Review.query.filter_by(reviewer_id=current_user.id).order_by(Review.created_at.desc()).all()
     return render_template('profile.html', form=form, received_reviews=received_reviews, authored_reviews=authored_reviews)
 
 
@@ -156,10 +156,10 @@ def view_profile(user_id):
     listings = (
         Post.query
         .filter_by(owner_id=user.id, is_active=True)
-        .order_by(Post.timestamp.desc())
+        .order_by(Post.created_at.desc())
         .all()
     )
-    reviews = Review.query.filter_by(reviewed_id=user.id).order_by(Review.timestamp.desc()).all()
+    reviews = Review.query.filter_by(reviewed_id=user.id).order_by(Review.created_at.desc()).all()
     return render_template('view_profile.html', user=user, listings=listings, reviews=reviews)
 
 
@@ -205,7 +205,7 @@ def view_post(post_id):
         flash('Message sent!')
         return redirect(url_for('main.view_post', post_id=post.id))
 
-    reviews = Review.query.filter_by(reviewed_id=post.owner_id).order_by(Review.timestamp.desc()).all()
+    reviews = Review.query.filter_by(reviewed_id=post.owner_id).order_by(Review.created_at.desc()).all()
     is_favorite = Favorite.query.filter_by(user_id=current_user.id, post_id=post.id).first() is not None
     return render_template('post.html', post=post, form=form, reviews=reviews, is_favorite=is_favorite)
 
@@ -217,7 +217,7 @@ def favorites():
         Post.query
         .join(Favorite, Favorite.post_id == Post.id)
         .filter(Favorite.user_id == current_user.id, Post.is_active == True)
-        .order_by(Favorite.timestamp.desc())
+        .order_by(Favorite.created_at.desc())
         .all()
     )
     return render_template('favorites.html', posts=saved_posts)
@@ -300,7 +300,7 @@ def messages():
     all_messages = (
         Message.query
         .filter(or_(Message.sender_id == current_user.id, Message.receiver_id == current_user.id))
-        .order_by(Message.timestamp.asc())
+        .order_by(Message.created_at.asc())
         .all()
     )
 
@@ -317,7 +317,7 @@ def messages():
 
     conversations = sorted(
         conversations_by_user.values(),
-        key=lambda conversation: conversation['last_message'].timestamp,
+        key=lambda conversation: conversation['last_message'].created_at,
         reverse=True,
     )
 
