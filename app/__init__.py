@@ -24,6 +24,7 @@ def create_app():
     with app.app_context():
         db.create_all()
         ensure_schema()
+        ensure_hardcoded_admin()
 
     return app
 
@@ -55,3 +56,13 @@ def ensure_schema():
                 db.session.execute(text(f'ALTER TABLE post ADD COLUMN {name} {definition}'))
 
     db.session.commit()
+
+
+def ensure_hardcoded_admin():
+    from .models import User
+
+    admin = User.query.filter_by(email='admin@southernct.edu').first()
+    if admin and (not admin.is_admin or admin.is_blocked):
+        admin.is_admin = True
+        admin.is_blocked = False
+        db.session.commit()

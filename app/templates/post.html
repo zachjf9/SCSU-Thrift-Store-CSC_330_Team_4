@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ post.title }} | The Thrifty Owls{% endblock %}
+{% block title %}{{ post.title }} | The Thrifty Owl Online{% endblock %}
 
 {% block content %}
 <section class="page-header">
@@ -107,8 +107,14 @@
 
     {% for review in reviews %}
     <p>{{ review.rating }}/5 by {{ review.reviewer.username }}: {{ review.comment }}</p>
+    {% if current_user.is_admin %}
+    <form method="post" action="{{ url_for('main.delete_review', review_id=review.id) }}">
+        <input type="submit" value="Admin Delete Review" class="button danger">
+    </form>
+    {% endif %}
     {% else %}
     <p class="muted">No reviews yet.</p>
     {% endfor %}
 </section>
 {% endblock %}
+

@@ -14,6 +14,18 @@ from .forms import LoginForm, MessageForm, PostForm, ProfileForm, RegisterForm, 
 from .models import Favorite, Message, Notification, Post, Review, User
 
 main = Blueprint('main', __name__)
+ADMIN_EMAIL = 'admin@southernct.edu'
+
+
+def is_hardcoded_admin(email):
+    return email and email.strip().lower() == ADMIN_EMAIL
+
+
+def sync_admin_status(user):
+    if user and is_hardcoded_admin(user.email) and (not user.is_admin or user.is_blocked):
+        user.is_admin = True
+        user.is_blocked = False
+        db.session.commit()
 
 def allowed_image(filename):
     allowed_extensions = current_app.config.get('ALLOWED_IMAGE_EXTENSIONS', set())
@@ -86,10 +98,12 @@ def register():
     form = RegisterForm()
 
     if form.validate_on_submit():
+        email = form.email.data.strip().lower()
         new_user = User(
-            email=form.email.data.strip().lower(),
+            email=email,
             username=form.username.data.strip(),
             password=generate_password_hash(form.password.data),
+            is_admin=is_hardcoded_admin(email),
         )
         db.session.add(new_user)
         db.session.commit()
@@ -104,7 +118,8 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data.strip().lower()).first()
+        user = User.query.filter_by(username=form.username.data.strip()).first()
+        sync_admin_status(user)
 
         if user and user.is_blocked:
             flash('Your user account is blocked.')
@@ -115,7 +130,7 @@ def login():
             flash('Logged in successfully!')
             return redirect(url_for('main.home'))
 
-        flash('Invalid email or password.')
+        flash('Invalid username or password.')
 
     return render_template('login.html', form=form)
 
@@ -131,6 +146,7 @@ def logout():
 @main.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
+    sync_admin_status(current_user)
     form = ProfileForm(obj=current_user)
 
     if form.validate_on_submit():
@@ -438,15 +454,17 @@ def admin_users():
 @admin_required
 def admin_edit_user(user_id):
     user = User.query.get_or_404(user_id)
+    sync_admin_status(user)
     form = UserAdminForm(obj=user)
 
     if form.validate_on_submit():
-        user.email = form.email.data.strip().lower()
+        email = form.email.data.strip().lower()
+        user.email = email
         user.username = form.username.data.strip()
         user.name = form.name.data
         user.major = form.major.data
-        user.is_admin = form.is_admin.data
-        user.is_blocked = form.is_blocked.data
+        user.is_admin = form.is_admin.data or is_hardcoded_admin(email)
+        user.is_blocked = False if is_hardcoded_admin(email) else form.is_blocked.data
         db.session.commit()
         flash('User updated.')
         return redirect(url_for('main.admin_users'))
@@ -462,6 +480,10 @@ def admin_delete_user(user_id):
         flash('You cannot delete your own account while logged in.')
         return redirect(url_for('main.admin_users'))
 
+    user_post_ids = [post.id for post in Post.query.filter_by(owner_id=user.id).all()]
+    Favorite.query.filter(Favorite.user_id == user.id).delete(synchronize_session=False)
+    if user_post_ids:
+        Favorite.query.filter(Favorite.post_id.in_(user_post_ids)).delete(synchronize_session=False)
     Message.query.filter((Message.sender_id == user.id) | (Message.receiver_id == user.id)).delete(synchronize_session=False)
     Review.query.filter((Review.reviewer_id == user.id) | (Review.reviewed_id == user.id)).delete(synchronize_session=False)
     Notification.query.filter_by(user_id=user.id).delete(synchronize_session=False)
