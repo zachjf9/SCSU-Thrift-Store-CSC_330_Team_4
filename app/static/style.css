@@ -184,7 +184,6 @@ button:hover,
     color: var(--text);
 }
 
-/* Danger variant */
 .button.danger,
 input[type="submit"].danger {
     background: var(--danger);
