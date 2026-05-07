@@ -22,9 +22,11 @@
     <p class="muted">{{ report.created_at.strftime('%b %d, %Y at %I:%M %p') }}</p>
 
     {% if report.status != 'Resolved' %}
-    <form method="post" action="{{ url_for('main.resolve_report', report_id=report.id) }}">
-        <input type="submit" value="Mark Resolved" class="button secondary">
-    </form>
+    <div class="form-center">
+        <form method="post" action="{{ url_for('main.resolve_report', report_id=report.id) }}">
+            <input type="submit" value="Mark Resolved" class="button secondary">
+        </form>
+    </div>
     {% endif %}
 </section>
 {% else %}

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import os 
 from uuid import uuid4
 
-from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request
+from flask import Blueprint, current_app, render_template, redirect, url_for, flash, get_flashed_messages, request
 from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy import or_
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -95,6 +95,9 @@ def home():
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
+    if request.method == 'GET':
+        get_flashed_messages()
+
     form = RegisterForm()
 
     if form.validate_on_submit():

@@ -23,10 +23,15 @@
 <section class="card">
     <h1>The Thrifty Owl Online</h1>
     <p class="muted">A student marketplace for SCSU users.</p>
-    <p>
+    <div class="landing-actions">
         <a class="button" href="{{ url_for('main.register') }}">Register</a>
         <a class="button secondary" href="{{ url_for('main.login') }}">Login</a>
-    </p>
+    </div>
+
+    <div class="landing-logo-slot" aria-label="Southern Connecticut State University logo">
+        <img id="logo" src="{{ url_for('static', filename='images/SCSULOGO.jpg') }}" alt="SCSU Logo" width="250"
+            height="200">
+    </div>
 </section>
 
 {% else %}
@@ -109,7 +114,7 @@
             {% if current_user.is_authenticated and post.owner_id != current_user.id %}
             {% if post.id in favorite_post_ids %}
             <form method="post" action="{{ url_for('main.unfavorite_post', post_id=post.id) }}">
-                <input type="submit" value="Remove Favorite">
+                <input type="submit" value="Remove Favorite" class="button danger">
             </form>
             {% else %}
             <form method="post" action="{{ url_for('main.favorite_post', post_id=post.id) }}">
@@ -134,4 +139,3 @@
 {% endif %}
 
 {% endblock %}
-

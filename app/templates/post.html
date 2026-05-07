@@ -54,7 +54,7 @@
 
         <div class="form-center">
             <form method="post" action="{{ url_for('main.unfavorite_post', post_id=post.id) }}">
-                <input type="submit" value="Remove Favorite" class="button secondary">
+                <input type="submit" value="Remove Favorite" class="button danger">
             </form>
         </div>
 
@@ -129,4 +129,3 @@
     {% endfor %}
 </section>
 {% endblock %}
-

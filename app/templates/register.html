@@ -6,6 +6,10 @@
 
 {% block main_class %}landing-container landing-form-container{% endblock %}
 
+{% block flash_messages %}
+{% with messages = get_flashed_messages() %}{% endwith %}
+{% endblock %}
+
 {% block content %}
 <section class="landing-form-panel" aria-labelledby="register-title">
     <h1>The Thrifty Owl Online</h1>

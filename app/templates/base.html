@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
-<body>
+<body class="{% block body_class %}{% endblock %}">
+    {% block header %}
     <header class="topbar">
         <div class="topbar-left">
             <a class="brand" href="{{ url_for('main.home') }}">The Thrifty Owl Online</a>
@@ -37,8 +38,10 @@
             </nav>
         </div>
     </header>
+    {% endblock %}
 
-    <main class="container">
+    <main class="{% block main_class %}container{% endblock %}">
+        {% block flash_messages %}
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         <div class="flash-list">
@@ -48,10 +51,10 @@
         </div>
         {% endif %}
         {% endwith %}
+        {% endblock %}
 
         {% block content %}{% endblock %}
     </main>
-    </div>
 </body>
 
 </html>
