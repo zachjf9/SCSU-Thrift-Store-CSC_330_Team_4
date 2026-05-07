@@ -20,7 +20,14 @@
 
 {% if not current_user.is_authenticated %}
 
-{% include 'landingPage.html' %}
+<section class="card">
+    <h1>The Thrifty Owl Online</h1>
+    <p class="muted">A student marketplace for SCSU users.</p>
+    <p>
+        <a class="button" href="{{ url_for('main.register') }}">Register</a>
+        <a class="button secondary" href="{{ url_for('main.login') }}">Login</a>
+    </p>
+</section>
 
 {% else %}
 

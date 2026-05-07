@@ -34,16 +34,16 @@ def ensure_schema():
     inspector = inspect(db.engine)
 
     if 'users' in inspector.get_table_names():
-        user_columns = {column['name'] for column in inspector.get_columns('user')}
+        user_columns = {column['name'] for column in inspector.get_columns('users')}
         additions = {
             'is_blocked': 'BOOLEAN DEFAULT 0',
         }
         for name, definition in additions.items():
             if name not in user_columns:
-                db.session.execute(text(f'ALTER TABLE user ADD COLUMN {name} {definition}'))
+                db.session.execute(text(f'ALTER TABLE users ADD COLUMN {name} {definition}'))
 
     if 'posts' in inspector.get_table_names():
-        post_columns = {column['name'] for column in inspector.get_columns('post')}
+        post_columns = {column['name'] for column in inspector.get_columns('posts')}
         additions = {
             'category': "VARCHAR(80) DEFAULT 'General'",
             'price': 'NUMERIC(10, 2)',
@@ -53,7 +53,7 @@ def ensure_schema():
         }
         for name, definition in additions.items():
             if name not in post_columns:
-                db.session.execute(text(f'ALTER TABLE post ADD COLUMN {name} {definition}'))
+                db.session.execute(text(f'ALTER TABLE posts ADD COLUMN {name} {definition}'))
 
     db.session.commit()
 

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | The Thrifty Owl Online{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>{{ title }}</h1>
+    <p class="muted">{{ target }}</p>
+</section>
+
+<section class="card">
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div>
+            <label for="{{ form.reason.id }}">{{ form.reason.label.text }}</label>
+            {{ form.reason(rows=5) }}
+            {% for error in form.reason.errors %}
+            <p class="field-errors">{{ error }}</p>
+            {% endfor %}
+        </div>
+        <div class="form-center">
+            {{ form.submit(class="button danger") }}
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -112,6 +112,14 @@ class ReviewForm(FlaskForm):
     submit = SubmitField('Submit Review')
 
 
+class ReportForm(FlaskForm):
+    reason = TextAreaField('Reason', validators=[
+        DataRequired(),
+        Length(max=500)
+    ])
+    submit = SubmitField('Submit Report')
+
+
 class UserAdminForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Length(max=150)])
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=150)])

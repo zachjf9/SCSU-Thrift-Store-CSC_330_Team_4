@@ -95,6 +95,18 @@
             </a>
         </div>
 
+        <div class="form-center">
+            <a class="button secondary" href="{{ url_for('main.report_listing', post_id=post.id) }}">
+                Flag Listing
+            </a>
+        </div>
+
+        <div class="form-center">
+            <a class="button secondary" href="{{ url_for('main.report_user', user_id=post.owner_id) }}">
+                Flag User
+            </a>
+        </div>
+
         {% else %}
         <h2>Your Listing</h2>
         <p class="muted">This is your listing, so the message form is hidden.</p>

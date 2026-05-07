@@ -26,6 +26,7 @@
 
                 {% if current_user.is_admin %}
                 <a class="secondary" href="{{ url_for('main.admin_users') }}">Manage Users</a>
+                <a class="secondary" href="{{ url_for('main.admin_reports') }}">Flagged Reports</a>
                 {% endif %}
 
                 <a href="{{ url_for('main.logout') }}">Logout</a>
