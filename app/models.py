@@ -4,6 +4,8 @@ from datetime import datetime
 
 # User
 class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True)
     is_admin = db.Column(db.Boolean, default=False)
     is_blocked = db.Column(db.Boolean, default=False)
@@ -28,6 +30,7 @@ class User(UserMixin, db.Model):
 
 # Posts
 class Post(db.Model):
+    __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
 
     title = db.Column(db.String(150), nullable=False)
@@ -46,6 +49,8 @@ class Post(db.Model):
 
 
 class Favorite(db.Model):
+    __tablename__ = 'favorites'
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
@@ -57,6 +62,7 @@ class Favorite(db.Model):
 
 # Messages
 class Message(db.Model):
+    __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True)
 
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -68,6 +74,7 @@ class Message(db.Model):
 
 # Reviews
 class Review(db.Model):
+    __tablename__ = 'reviews'
     id = db.Column(db.Integer, primary_key=True)
 
     reviewer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -81,6 +88,7 @@ class Review(db.Model):
 
 # Notifications
 class Notification(db.Model):
+    __tablename__ = 'notifications'
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
