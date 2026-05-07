@@ -2,8 +2,8 @@ create table users (
     --Primary key
     id integer generated always as identity primary key,
 
-    email varchar(255) unique not null,
-    username varchar(100) unique not null,
+    email varchar(150) unique not null,
+    username varchar(150) unique not null,
     password text not null,
 
     name varchar(100),
@@ -19,7 +19,7 @@ create table posts (
     --Foreign keys
     owner_id integer not null,
 
-    title varchar(255),
+    title varchar(150) not null,
     description text not null,
     category varchar(100),
     price numeric(10,2),
@@ -80,7 +80,7 @@ create table reviews (
                      check (rating between 1 and 5),
 
     constraint chk_reviews_not_self
-                     check (reviews.reviewer_id <> reviews.reviewed_id));
+                     check (reviewer_id <> reviewed_id));
 
 create table notifications (
     --Primary key
