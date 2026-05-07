@@ -32,7 +32,7 @@ def ensure_schema():
     """Add small SQLite columns used by the class project use cases."""
     inspector = inspect(db.engine)
 
-    if 'user' in inspector.get_table_names():
+    if 'users' in inspector.get_table_names():
         user_columns = {column['name'] for column in inspector.get_columns('user')}
         additions = {
             'is_blocked': 'BOOLEAN DEFAULT 0',
@@ -41,7 +41,7 @@ def ensure_schema():
             if name not in user_columns:
                 db.session.execute(text(f'ALTER TABLE user ADD COLUMN {name} {definition}'))
 
-    if 'post' in inspector.get_table_names():
+    if 'posts' in inspector.get_table_names():
         post_columns = {column['name'] for column in inspector.get_columns('post')}
         additions = {
             'category': "VARCHAR(80) DEFAULT 'General'",
