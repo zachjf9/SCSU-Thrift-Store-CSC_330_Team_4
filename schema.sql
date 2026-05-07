@@ -4,11 +4,11 @@ create table users (
 
     email varchar(150) unique not null,
     username varchar(150) unique not null,
-    password text not null,
+    password varchar(150) not null,
 
     name varchar(150),
     major varchar(150),
-    interests varchar (300),
+    interests varchar(300),
     image varchar(200),
 
     is_admin boolean default false,
@@ -23,11 +23,11 @@ create table posts (
 
     title varchar(150) not null,
     description varchar(300) not null,
-    category varchar(100),
+    category varchar(80),
     price numeric(10,2),
-    condition varchar(100),
-    status varchar(100),
-    image text,
+    condition varchar(80),
+    status varchar(80),
+    image varchar(200),
     created_at timestamp default current_timestamp,
     is_active boolean default true,
 
@@ -90,7 +90,7 @@ create table notifications (
     --Foreign key
     user_id integer not null,
 
-    message text not null,
+    message varchar(300) not null,
     is_read boolean default false,
     created_at timestamp default current_timestamp,
 
