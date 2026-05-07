@@ -18,7 +18,7 @@
         <a class="button secondary" href="{{ url_for('main.admin_edit_user', user_id=user.id) }}">Edit</a>
         {% if user.id != current_user.id %}
         <form class="inline-form" method="post" action="{{ url_for('main.admin_delete_user', user_id=user.id) }}">
-            <input type="submit" value="Delete">
+            <input type="submit" value="Delete User" class="button danger">
         </form>
         {% endif %}
     </div>
@@ -27,3 +27,4 @@
 <p class="empty">No users.</p>
 {% endfor %}
 {% endblock %}
+

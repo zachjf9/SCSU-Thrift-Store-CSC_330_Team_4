@@ -1,39 +1,45 @@
 {% extends "base.html" %}
 
-{% block title %}Favorites | The Thrifty Owls{% endblock %}
+{% block title %}Favorites | The Thrifty Owl Online{% endblock %}
 
 {% block content %}
 <section class="page-header">
-    <h1>Your Favorite Listings</h1>
-    <p class="muted">Listings you saved for later are collected here.</p>
+    <h1>Your Favorites</h1>
+    <p class="muted">Listings you saved for later.</p>
 </section>
 
-<section>
-    {% if posts %}
-    <div class="grid">
-        {% for post in posts %}
-        <article class="card">
-            <h3><a href="{{ url_for('main.view_post', post_id=post.id) }}">{{ post.title }}</a></h3>
-            <p>{{ post.description }}</p>
-            <div class="meta">
-                <span>{{ post.category }}</span>
-                {% if post.price is not none %}
-                <span>${{ "%.2f"|format(post.price) }}</span>
-                {% endif %}
-                <span>{{ post.status or 'Available' }}</span>
-                <span>Posted by <a href="{{ url_for('main.view_profile', user_id=post.owner_id) }}">{{
-                        post.owner.username }}</a></span>
-            </div>
-            <div class="form-center">
-                <form method="post" action="{{ url_for('main.unfavorite_post', post_id=post.id) }}">
-                    <input type="submit" value="Remove Favorite" class="button danger">
-                </form>
-            </div>
-        </article>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty">You have not favorited any listings yet.</div>
-    {% endif %}
+{% if posts %}
+<section class="grid">
+    {% for post in posts %}
+    <article class="card listing">
+        <h2><a href="{{ url_for('main.view_post', post_id=post.id) }}">{{ post.title }}</a></h2>
+
+        {% if post.image %}
+        <p>
+            <img src="{{ url_for('static', filename='uploads/' ~ post.image) }}" alt="{{ post.title }}" style="max-width: 50%; border-radius: 16px;">
+        </p>
+        {% endif %}
+
+        <p>{{ post.description }}</p>
+        <div class="meta">
+            <span>{{ post.category }}</span>
+            {% if post.price is not none %}
+            <span>${{ "%.2f"|format(post.price) }}</span>
+            {% endif %}
+            <span>{{ post.status or 'Available' }}</span>
+            <span>
+                Posted by
+                <a href="{{ url_for('main.view_profile', user_id=post.owner_id) }}">{{ post.owner.username }}</a>
+            </span>
+        </div>
+
+        <form method="post" action="{{ url_for('main.unfavorite_post', post_id=post.id) }}">
+            <input type="submit" value="Remove Favorite" class="button secondary">
+        </form>
+    </article>
+    {% endfor %}
 </section>
+{% else %}
+<p class="empty">You have not saved any favorites yet.</p>
+{% endif %}
 {% endblock %}

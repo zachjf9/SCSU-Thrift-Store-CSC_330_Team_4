@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}The Thrifty Owls{% endblock %}
+{% block title %}The Thrifty Owl Online{% endblock %}
 
 {% block body_class %}
 {% if not current_user.is_authenticated %}landing-page{% endif %}
@@ -20,12 +20,19 @@
 
 {% if not current_user.is_authenticated %}
 
-{% include 'landingPage.html' %}
+<section class="card">
+    <h1>The Thrifty Owl Online</h1>
+    <p class="muted">A student marketplace for SCSU users.</p>
+    <p>
+        <a class="button" href="{{ url_for('main.register') }}">Register</a>
+        <a class="button secondary" href="{{ url_for('main.login') }}">Login</a>
+    </p>
+</section>
 
 {% else %}
 
 <section class="card">
-    <h1>The Thrifty Owls</h1>
+    <h1>The Thrifty Owl Online</h1>
     <p class="muted">Browse items posted by other students.</p>
     <p>
         <a class="button" href="{{ url_for('main.create_post') }}">
@@ -110,6 +117,12 @@
             </form>
             {% endif %}
             {% endif %}
+
+            {% if current_user.is_admin %}
+            <form method="post" action="{{ url_for('main.delete_post', post_id=post.id) }}">
+                <input type="submit" value="Admin Delete Listing" class="button danger">
+            </form>
+            {% endif %}
         </article>
         {% endfor %}
     </div>
@@ -121,3 +134,4 @@
 {% endif %}
 
 {% endblock %}
+

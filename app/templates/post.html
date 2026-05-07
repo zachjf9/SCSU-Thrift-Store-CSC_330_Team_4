@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ post.title }} | The Thrifty Owls{% endblock %}
+{% block title %}{{ post.title }} | The Thrifty Owl Online{% endblock %}
 
 {% block content %}
 <section class="page-header">
@@ -95,6 +95,18 @@
             </a>
         </div>
 
+        <div class="form-center">
+            <a class="button secondary" href="{{ url_for('main.report_listing', post_id=post.id) }}">
+                Flag Listing
+            </a>
+        </div>
+
+        <div class="form-center">
+            <a class="button secondary" href="{{ url_for('main.report_user', user_id=post.owner_id) }}">
+                Flag User
+            </a>
+        </div>
+
         {% else %}
         <h2>Your Listing</h2>
         <p class="muted">This is your listing, so the message form is hidden.</p>
@@ -107,8 +119,14 @@
 
     {% for review in reviews %}
     <p>{{ review.rating }}/5 by {{ review.reviewer.username }}: {{ review.comment }}</p>
+    {% if current_user.is_admin %}
+    <form method="post" action="{{ url_for('main.delete_review', review_id=review.id) }}">
+        <input type="submit" value="Admin Delete Review" class="button danger">
+    </form>
+    {% endif %}
     {% else %}
     <p class="muted">No reviews yet.</p>
     {% endfor %}
 </section>
 {% endblock %}
+

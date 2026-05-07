@@ -10,10 +10,22 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 from . import db
-from .forms import LoginForm, MessageForm, PostForm, ProfileForm, RegisterForm, ReviewForm, UserAdminForm
-from .models import Favorite, Message, Notification, Post, Review, User
+from .forms import LoginForm, MessageForm, PostForm, ProfileForm, RegisterForm, ReportForm, ReviewForm, UserAdminForm
+from .models import Favorite, Message, Notification, Post, Report, Review, User
 
 main = Blueprint('main', __name__)
+ADMIN_EMAIL = 'admin@southernct.edu'
+
+
+def is_hardcoded_admin(email):
+    return email and email.strip().lower() == ADMIN_EMAIL
+
+
+def sync_admin_status(user):
+    if user and is_hardcoded_admin(user.email) and (not user.is_admin or user.is_blocked):
+        user.is_admin = True
+        user.is_blocked = False
+        db.session.commit()
 
 def allowed_image(filename):
     allowed_extensions = current_app.config.get('ALLOWED_IMAGE_EXTENSIONS', set())
@@ -86,10 +98,12 @@ def register():
     form = RegisterForm()
 
     if form.validate_on_submit():
+        email = form.email.data.strip().lower()
         new_user = User(
-            email=form.email.data.strip().lower(),
+            email=email,
             username=form.username.data.strip(),
             password=generate_password_hash(form.password.data),
+            is_admin=is_hardcoded_admin(email),
         )
         db.session.add(new_user)
         db.session.commit()
@@ -104,7 +118,8 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data.strip().lower()).first()
+        user = User.query.filter_by(username=form.username.data.strip()).first()
+        sync_admin_status(user)
 
         if user and user.is_blocked:
             flash('Your user account is blocked.')
@@ -115,7 +130,7 @@ def login():
             flash('Logged in successfully!')
             return redirect(url_for('main.home'))
 
-        flash('Invalid email or password.')
+        flash('Invalid username or password.')
 
     return render_template('login.html', form=form)
 
@@ -131,6 +146,7 @@ def logout():
 @main.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
+    sync_admin_status(current_user)
     form = ProfileForm(obj=current_user)
 
     if form.validate_on_submit():
@@ -161,6 +177,53 @@ def view_profile(user_id):
     )
     reviews = Review.query.filter_by(reviewed_id=user.id).order_by(Review.created_at.desc()).all()
     return render_template('view_profile.html', user=user, listings=listings, reviews=reviews)
+
+
+@main.route('/report/user/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def report_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        flash('You cannot flag your own account.')
+        return redirect(url_for('main.profile'))
+
+    form = ReportForm()
+    if form.validate_on_submit():
+        report = Report(
+            reporter_id=current_user.id,
+            reported_user_id=user.id,
+            reason=form.reason.data,
+        )
+        db.session.add(report)
+        db.session.commit()
+        flash('User report submitted for admin review.')
+        return redirect(url_for('main.view_profile', user_id=user.id))
+
+    return render_template('report_form.html', form=form, title='Flag User', target=user.username)
+
+
+@main.route('/report/listing/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def report_listing(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.owner_id == current_user.id:
+        flash('You cannot flag your own listing.')
+        return redirect(url_for('main.view_post', post_id=post.id))
+
+    form = ReportForm()
+    if form.validate_on_submit():
+        report = Report(
+            reporter_id=current_user.id,
+            reported_user_id=post.owner_id,
+            post_id=post.id,
+            reason=form.reason.data,
+        )
+        db.session.add(report)
+        db.session.commit()
+        flash('Listing report submitted for admin review.')
+        return redirect(url_for('main.view_post', post_id=post.id))
+
+    return render_template('report_form.html', form=form, title='Flag Listing', target=post.title)
 
 
 @main.route('/create-post', methods=['GET', 'POST'])
@@ -289,6 +352,7 @@ def delete_post(post_id):
         return redirect(url_for('main.view_post', post_id=post.id))
 
     post.is_active = False
+    Report.query.filter_by(post_id=post.id).update({'status': 'Resolved'}, synchronize_session=False)
     db.session.commit()
     flash('Listing deleted.')
     return redirect(url_for('main.home'))
@@ -434,19 +498,38 @@ def admin_users():
     return render_template('admin_users.html', users=users)
 
 
+@main.route('/admin/reports')
+@admin_required
+def admin_reports():
+    reports = Report.query.order_by(Report.created_at.desc()).all()
+    return render_template('admin_reports.html', reports=reports)
+
+
+@main.route('/admin/reports/<int:report_id>/resolve', methods=['POST'])
+@admin_required
+def resolve_report(report_id):
+    report = Report.query.get_or_404(report_id)
+    report.status = 'Resolved'
+    db.session.commit()
+    flash('Report marked as resolved.')
+    return redirect(url_for('main.admin_reports'))
+
+
 @main.route('/admin/users/<int:user_id>/edit', methods=['GET', 'POST'])
 @admin_required
 def admin_edit_user(user_id):
     user = User.query.get_or_404(user_id)
+    sync_admin_status(user)
     form = UserAdminForm(obj=user)
 
     if form.validate_on_submit():
-        user.email = form.email.data.strip().lower()
+        email = form.email.data.strip().lower()
+        user.email = email
         user.username = form.username.data.strip()
         user.name = form.name.data
         user.major = form.major.data
-        user.is_admin = form.is_admin.data
-        user.is_blocked = form.is_blocked.data
+        user.is_admin = form.is_admin.data or is_hardcoded_admin(email)
+        user.is_blocked = False if is_hardcoded_admin(email) else form.is_blocked.data
         db.session.commit()
         flash('User updated.')
         return redirect(url_for('main.admin_users'))
@@ -462,9 +545,15 @@ def admin_delete_user(user_id):
         flash('You cannot delete your own account while logged in.')
         return redirect(url_for('main.admin_users'))
 
+    user_post_ids = [post.id for post in Post.query.filter_by(owner_id=user.id).all()]
+    Favorite.query.filter(Favorite.user_id == user.id).delete(synchronize_session=False)
+    if user_post_ids:
+        Favorite.query.filter(Favorite.post_id.in_(user_post_ids)).delete(synchronize_session=False)
+        Report.query.filter(Report.post_id.in_(user_post_ids)).delete(synchronize_session=False)
     Message.query.filter((Message.sender_id == user.id) | (Message.receiver_id == user.id)).delete(synchronize_session=False)
     Review.query.filter((Review.reviewer_id == user.id) | (Review.reviewed_id == user.id)).delete(synchronize_session=False)
     Notification.query.filter_by(user_id=user.id).delete(synchronize_session=False)
+    Report.query.filter((Report.reporter_id == user.id) | (Report.reported_user_id == user.id)).delete(synchronize_session=False)
     Post.query.filter_by(owner_id=user.id).delete(synchronize_session=False)
     db.session.delete(user)
     db.session.commit()

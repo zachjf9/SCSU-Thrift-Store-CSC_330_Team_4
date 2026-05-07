@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Messages | The Thrifty Owls{% endblock %}
+{% block title %}Messages | The Thrifty Owl Online{% endblock %}
 
 {% block content %}
 <section class="page-header">
@@ -18,7 +18,7 @@
             {% else %}
             {{ conversation.last_message.content }}
             {% endif %}
-            <span class="muted">{{ conversation.last_message.timestamp.strftime('%b %d, %Y at %I:%M %p') }}</span>
+            <span class="muted">{{ conversation.last_message.created_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
         </summary>
 
         {% for message in conversation.messages %}
@@ -27,7 +27,7 @@
                 %}:</strong>
             {{ message.content }}
             <br>
-            <span class="muted">{{ message.timestamp.strftime('%b %d, %Y at %I:%M %p') }}</span>
+            <span class="muted">{{ message.created_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
         </p>
         {% endfor %}
 

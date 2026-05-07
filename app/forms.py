@@ -41,7 +41,7 @@ class RegisterForm(FlaskForm):
 
 # Login
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[
+    username = StringField('Username', validators=[
         DataRequired(),
         Length(max=150)
     ])
@@ -110,6 +110,14 @@ class ReviewForm(FlaskForm):
         Length(max=300)
     ])
     submit = SubmitField('Submit Review')
+
+
+class ReportForm(FlaskForm):
+    reason = TextAreaField('Reason', validators=[
+        DataRequired(),
+        Length(max=500)
+    ])
+    submit = SubmitField('Submit Report')
 
 
 class UserAdminForm(FlaskForm):

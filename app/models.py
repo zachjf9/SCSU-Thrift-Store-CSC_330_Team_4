@@ -60,6 +60,22 @@ class Favorite(db.Model):
     post = db.relationship('Post', backref=db.backref('favorites', lazy=True))
     __table_args__ = (db.UniqueConstraint('user_id', 'post_id', name='unique_user_favorite'),)
 
+
+class Report(db.Model):
+    __tablename__ = 'reports'
+
+    id = db.Column(db.Integer, primary_key=True)
+    reporter_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    reported_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    reason = db.Column(db.String(500), nullable=False)
+    status = db.Column(db.String(50), default='Open')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    reporter = db.relationship('User', foreign_keys=[reporter_id], backref=db.backref('reports_made', lazy=True))
+    reported_user = db.relationship('User', foreign_keys=[reported_user_id], backref=db.backref('reports_received', lazy=True))
+    post = db.relationship('Post', backref=db.backref('reports', lazy=True))
+
 # Messages
 class Message(db.Model):
     __tablename__ = 'messages'
