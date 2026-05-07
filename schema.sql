@@ -6,9 +6,11 @@ create table users (
     username varchar(150) unique not null,
     password text not null,
 
-    name varchar(100),
-    major varchar(100),
-    interests text,
+    name varchar(150),
+    major varchar(150),
+    interests varchar (300),
+    image varchar(200),
+
     is_admin boolean default false,
     is_blocked boolean default false);
 
@@ -20,7 +22,7 @@ create table posts (
     owner_id integer not null,
 
     title varchar(150) not null,
-    description text not null,
+    description varchar(300) not null,
     category varchar(100),
     price numeric(10,2),
     condition varchar(100),
@@ -42,7 +44,7 @@ create table messages (
     sender_id integer not null,
     receiver_id integer not null,
 
-    content text not null,
+    content varchar(500) not null,
     created_at timestamp default current_timestamp,
 
     constraint fk_messages_sender
@@ -63,7 +65,7 @@ create table reviews (
     reviewed_id integer not null,
 
     rating integer not null,
-    comment text,
+    comment varchar(300),
     created_at timestamp default current_timestamp,
 
     constraint fk_reviews_reviewer
