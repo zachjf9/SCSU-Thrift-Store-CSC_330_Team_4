@@ -28,7 +28,9 @@
         </div>
         <label>{{ form.is_admin() }} {{ form.is_admin.label.text }}</label>
         <label>{{ form.is_blocked() }} {{ form.is_blocked.label.text }}</label>
-        {{ form.submit() }}
+        <div class="form-center">
+            {{ form.submit() }}
+        </div>
     </form>
 </section>
 {% endblock %}
