@@ -28,8 +28,8 @@ create table posts (
     condition varchar(80),
     status varchar(80),
     image varchar(200),
-    created_at timestamp default current_timestamp,
     is_active boolean default true,
+    created_at timestamp default current_timestamp,
 
     constraint fk_posts_owner
                    foreign key (owner_id)
@@ -120,3 +120,33 @@ create table favorites (
 
     constraint unique_favorite
                        unique (user_id, post_id));
+
+create table reports (
+    --Primary key
+    id integer generated always as identity primary key,
+    --Foreign key
+    reporter_id integer not null,
+    reported_user_id integer,
+    post_id integer,
+
+    reason varchar(500) not null,
+    status varchar(50) default 'Open',
+    created_at timestamp default current_timestamp,
+
+    constraint fk_reports_reporter
+                     foreign key (reporter_id)
+                     references users(id)
+                     on delete cascade,
+
+    constraint fk_reports_reported
+                     foreign key (reported_user_id)
+                     references users(id)
+                     on delete cascade,
+
+    constraint fk_reports_post
+                     foreign key (post_id)
+                     references posts(id)
+                     on delete cascade,
+
+    constraint chk_reports_target
+                     check (reported_user_id is not null or post_id is not null));
