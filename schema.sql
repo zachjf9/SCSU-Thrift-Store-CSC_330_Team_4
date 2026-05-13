@@ -23,10 +23,10 @@ create table posts (
 
     title varchar(150) not null,
     description varchar(300) not null,
-    category varchar(80),
+    category varchar(80) not null default 'General',
     price numeric(10,2),
-    condition varchar(80),
-    status varchar(80),
+    condition varchar(80) not null default 'Good',
+    status varchar(80) not null default 'Available',
     image varchar(200),
     is_active boolean default true,
     created_at timestamp default current_timestamp,

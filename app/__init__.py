@@ -29,13 +29,13 @@ def create_app():
 
 
 def ensure_schema():
-    """Add small SQLite columns used by the class project use cases."""
+    """Add missing columns used by the class project use cases."""
     inspector = inspect(db.engine)
 
     if 'users' in inspector.get_table_names():
         user_columns = {column['name'] for column in inspector.get_columns('user')}
         additions = {
-            'is_blocked': 'BOOLEAN DEFAULT 0',
+            'is_blocked': 'BOOLEAN DEFAULT FALSE',
         }
         for name, definition in additions.items():
             if name not in user_columns:
@@ -48,7 +48,7 @@ def ensure_schema():
             'price': 'NUMERIC(10, 2)',
             'condition': "VARCHAR(80) DEFAULT 'Good'",
             'status': "VARCHAR(80) DEFAULT 'Available'",
-            'is_active': 'BOOLEAN DEFAULT 1',
+            'is_active': 'BOOLEAN DEFAULT TRUE',
         }
         for name, definition in additions.items():
             if name not in post_columns:
