@@ -4,7 +4,7 @@ create table users (
 
     email varchar(150) unique not null,
     username varchar(150) unique not null,
-    password varchar(150) not null,
+    password text not null,
 
     name varchar(150),
     major varchar(150),
